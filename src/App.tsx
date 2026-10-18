@@ -6,6 +6,7 @@ import {
   CalendarDays,
   Check,
   ChevronDown,
+  GitBranch,
   ExternalLink,
   Link2,
   LockKeyhole,
@@ -15,7 +16,6 @@ import {
   Sun,
   X,
   Zap,
-  Wine,
 } from "lucide-react";
 import {
   domains,
@@ -25,7 +25,7 @@ import {
   sources,
   surfaces,
 } from "./data/navigation";
-import type { Destination } from "./data/navigation";
+import type { ProjectDestination } from "./data/navigation";
 import {
   External,
   IconBox,
@@ -34,7 +34,6 @@ import {
   Topbar,
   Footer,
 } from "./components/Shared";
-import { winePageURL } from "./data/modules";
 
 function useLocalDate() {
   const [date, setDate] = useState(() => new Date());
@@ -50,24 +49,60 @@ function useLocalDate() {
   return date;
 }
 
-function DestinationCard({ item }: { item: Destination }) {
+function ProjectCard({ item }: { item: ProjectDestination }) {
   return (
-    <External href={item.href} className="project-card">
-      <div className="card-top">
-        <IconBox icon={item.icon} tone={item.tone} />
-        <ArrowUpRight size={17} className="outbound" aria-hidden="true" />
-      </div>
-      <h3>{item.title}</h3>
-      <p>{item.description}</p>
-      <span className="card-bottom">
-        <span className="subtle-dot" />
-        Notion project
-        <span className="private-label">
-          <LockKeyhole size={11} aria-hidden="true" />
-          Private destination
+    <article className="project-card" aria-label={`${item.title} workspace`}>
+      <External href={item.href} className="project-entry">
+        <div className="card-top">
+          <IconBox icon={item.icon} tone={item.tone} />
+          <span className="project-kind">{item.workspaceKind}</span>
+        </div>
+        <h3>{item.title}</h3>
+        <p>{item.description}</p>
+        <span className="project-access">
+          <LockKeyhole size={12} aria-hidden="true" />
+          Open in Notion
+          <ArrowUpRight size={14} aria-hidden="true" />
         </span>
-      </span>
-    </External>
+      </External>
+      <div className="project-tools">
+        <p className="tool-section-label">Software &amp; tools</p>
+        {item.tools.length ? (
+          <ul className="tool-list">
+            {item.tools.map((tool) => {
+              const content = (
+                <>
+                  <span className="tool-title">{tool.title}</span>{" "}
+                  <span className="tool-kind">{tool.kind}</span>{" "}
+                  <span className="tool-tracking">
+                    <GitBranch size={12} aria-hidden="true" /> Git-tracked
+                  </span>{" "}
+                  <span className="tool-action">
+                    {tool.href ? "Open workspace" : "Access through project"}
+                    <ArrowUpRight size={13} aria-hidden="true" />
+                  </span>
+                </>
+              );
+              return (
+                <li key={tool.title}>
+                  {tool.href ? (
+                    <a href={tool.href} className="tool-link">
+                      {content}
+                    </a>
+                  ) : (
+                    <External href={item.href} className="tool-link">
+                      {content}
+                    </External>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        ) : (
+          <p className="no-tools">No software linked yet.</p>
+        )}
+      </div>
+    </article>
   );
 }
 
@@ -218,44 +253,22 @@ export default function App() {
             <SectionHeading
               id="projects-title"
               title="Active-project links"
-              subtitle="Your Wine Production workspace and selected Notion project links."
+              subtitle="Open a project for context, or its software and tools to get things done."
             >
               <External href={sources.projects} className="text-link secondary">
                 All projects <ArrowUpRight size={14} aria-hidden="true" />
               </External>
             </SectionHeading>
             <div className="project-grid">
-              <a href={winePageURL} className="project-card wine-home-card">
-                <div className="card-top">
-                  <IconBox icon={Wine} tone="rose" />
-                  <ArrowUpRight
-                    size={17}
-                    className="outbound"
-                    aria-hidden="true"
-                  />
-                </div>
-                <h3>Wine Production</h3>
-                <p>
-                  Track winemaking projects, access batch records, and consult
-                  production guides.
-                </p>
-                <span className="card-bottom">
-                  <span className="subtle-dot" />
-                  Home &amp; Hobbies
-                  <span className="private-label">
-                    Open workspace <ArrowRight size={12} aria-hidden="true" />
-                  </span>
-                </span>
-              </a>
-
               {projects.map((item) => (
-                <DestinationCard key={item.href} item={item} />
+                <ProjectCard key={item.href} item={item} />
               ))}
             </div>
             <p className="source-note">
               <Link2 size={12} aria-hidden="true" />
-              Navigation snapshot · reviewed {navigationReviewed} · broad public
-              labels, private details at source
+              Navigation snapshot · reviewed {navigationReviewed} · Git-tracked
+              identifies software, not live status. Private details stay at
+              source.
             </p>
           </section>
 

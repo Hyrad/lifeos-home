@@ -611,11 +611,12 @@ main {
   gap: 14px;
 }
 .project-card {
-  display: block;
+  display: flex;
+  flex-direction: column;
   border: 1px solid var(--line);
   background: #181d21;
   border-radius: 9px;
-  padding: 19px 20px 0;
+  overflow: hidden;
   transition:
     border-color 0.18s,
     background 0.18s,
@@ -625,7 +626,89 @@ main {
 .project-card:hover {
   border-color: #566b5e;
   background: #1c2425;
-  transform: translateY(-2px);
+}
+.project-entry {
+  display: block;
+  padding: 20px;
+  flex: 1;
+}
+.project-entry:focus-visible,
+.tool-link:focus-visible {
+  outline-offset: -3px;
+  border-radius: 8px;
+}
+.project-kind {
+  font-size: 10px;
+  color: #c4d1ca;
+  border: 1px solid #3c4945;
+  border-radius: 5px;
+  padding: 4px 7px;
+}
+.project-access {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--mint);
+  font-size: 11px;
+  margin-top: 17px;
+}
+.project-tools {
+  border-top: 1px solid var(--line);
+  background: #141a1d;
+  padding: 15px 16px 16px;
+  min-height: 168px;
+}
+.tool-section-label {
+  color: #aab8b2;
+  font-size: 10px;
+  letter-spacing: 0.7px;
+  text-transform: uppercase;
+  margin-bottom: 9px;
+}
+.tool-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.tool-link {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 5px;
+  padding: 10px;
+  border: 1px solid #35413d;
+  border-radius: 7px;
+  background: #1c2623;
+}
+.tool-link:hover {
+  border-color: #749d88;
+  background: #23302b;
+}
+.tool-title {
+  font-size: 12px;
+  font-weight: 550;
+}
+.tool-kind,
+.no-tools {
+  color: #b1bdb8;
+  font-size: 11px;
+  line-height: 1.6;
+}
+.tool-tracking,
+.tool-action {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 5px;
+  font-size: 10px;
+  line-height: 1.6;
+}
+.tool-tracking {
+  color: #b1bdb8;
+}
+.tool-action {
+  color: var(--mint);
+  margin-top: 4px;
 }
 .card-top {
   display: flex;
@@ -680,7 +763,7 @@ main {
   letter-spacing: -0.2px;
   font-weight: 550;
 }
-.project-card > p {
+.project-entry > p {
   font-size: 12px;
   color: #a4adb4;
   line-height: 1.7;
@@ -1067,10 +1150,10 @@ footer > a:hover {
   .orbit-art {
     right: 35px;
   }
-  .project-card {
+  .project-entry {
     padding-top: 23px;
   }
-  .project-card > p {
+  .project-entry > p {
     min-height: 25px;
   }
   .section {
@@ -1362,32 +1445,34 @@ footer > a:hover {
     grid-template-columns: 1fr;
     gap: 10px;
   }
-  .project-card {
+  .project-entry {
     padding: 17px 18px;
-    position: relative;
     display: grid;
     grid-template-columns: 40px 1fr;
     column-gap: 15px;
     align-items: center;
   }
-  .card-top {
-    grid-row: 1/4;
+  .project-card .card-top {
+    grid-column: 1 / -1;
     margin: 0;
-    align-self: start;
-  }
-  .card-top > .outbound {
-    position: absolute;
-    right: 18px;
-    top: 19px;
+    margin-bottom: 12px;
   }
   .project-card h3 {
-    padding-right: 20px;
+    grid-column: 1 / -1;
     font-size: 14px;
   }
-  .project-card > p {
+  .project-entry > p {
+    grid-column: 1 / -1;
     min-height: 0;
     font-size: 11px;
     margin-top: 6px;
+  }
+  .project-access {
+    grid-column: 1 / -1;
+    margin-top: 12px;
+  }
+  .project-tools {
+    min-height: 0;
   }
   .card-bottom {
     margin: 10px 0 0;
@@ -1672,19 +1757,6 @@ footer > a:hover {
     transition: none !important;
     animation: none !important;
   }
-}
-
-/* Independent module entry card; module styles live in its own repository. */
-.wine-home-card {
-  border-color: #634448;
-  background: linear-gradient(140deg, #312326, #191e21 80%);
-}
-.wine-home-card:hover {
-  border-color: #bd8c8b;
-  background: linear-gradient(140deg, #3b292d, #202629 80%);
-}
-.wine-home-card .private-label {
-  color: #e2bdb4;
 }
 
 @media (min-width: 1200px) {

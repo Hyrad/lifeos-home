@@ -1,6 +1,10 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 1.1.1 is a **navigation edition**: open a destination and continue in its original app.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 0.1.2 is a **navigation edition**: open a destination and continue in its original app.
+
+## Release stage
+
+Home uses the 0.x series while the dashboard is evolving; 1.0 is reserved for the mature software product. This revision is 0.1.2, following the intended 0.1.1 baseline. Earlier commits used 1.x labels prematurely; their history is retained, and this release intentionally resets the displayed/package version. Independent modules, including Wine Production, keep their own versions.
 
 **Live site:** https://hyrad.github.io/lifeos-home/
 
@@ -11,13 +15,14 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 ## Included
 
 - Today: opens the existing private Notion Home without copying tasks.
-- Active-project links: selected destinations with broad public labels, not live progress.
+- Active-project links: canonical project/domain workspaces, with a distinct **Software & tools** area inside each card. Game Shelf is a software product; Travel planning contains a travel tracker; Wine Production has an independent web workspace. Fitness has no software linked yet.
+- Git-tracked labels identify software ownership, not live repository or deployment health. Game Shelf and Travel tracker currently route through their existing project records for access; no direct app URL is asserted or guessed.
 - Upcoming: opens Google Calendar without embedding private events.
 - Existing Surfaces: Cookbook, Shopping Hub, Grocery Shopping.
 - Searchable life domains, expandable on all devices.
 - Quick actions that open the original apps. Create and save there.
 - System overview with explicit disconnected/unmonitored labels.
-- Wine Production entry: one Home card and sidebar link to the independent Wine Production site.
+- Wine Production entry: a canonical Notion domain link plus a separate web-workspace link, and a sidebar shortcut to the independent site.
 
 Includes keyboard navigation, focus indicators, a skip link, reduced-motion support, and responsive layouts. The device date refreshes while open. It is not a data freshness indicator.
 
@@ -54,7 +59,7 @@ Alternatively set `BROWSER_CHANNEL=chrome` to use an installed Chrome. `CHECK_UR
 - [Notion LifeOS Home](https://app.notion.com/p/3f1be780ce1a81ccbd9ce0331175706f): original navigation and destination links.
 - [Surface governance](https://app.notion.com/p/3f1be780ce1a81c09529c394f5a44585): Home → Surface → canonical record. Existing ownership remains authoritative.
 
-The public allowlist is `src/data/navigation.ts`, reviewed on 2026-10-18. Every Notion destination was found beneath the Life Command Center or on its existing Home. Domain labels can use familiar short names for existing Areas. Private project labels are deliberately generalized. No travel dates, health context, family names, record summaries, or private implementation details are copied.
+The public allowlist is `src/data/navigation.ts`, reviewed on 2026-10-18. Every Notion destination was found beneath the Life Command Center or on its existing Home. Domain labels can use familiar short names for existing Areas. Private project labels are deliberately generalized. No travel dates, health context, family names, record summaries, or private implementation details are copied. Tool names and Git-tracked classifications are curated metadata; they do not query GitHub. Add a direct tool URL only after canonical verification and applicable publication approval; otherwise route through the existing project and label that route explicitly.
 
 Update links only after verifying them within the Life Command Center boundary. Change `navigationReviewed` only after an actual review. This site does not verify destination freshness, authentication, project activity, connection health, deployment health, or automation execution. Private destinations may require Notion access; this page grants none. Do not publish those pages to make links work.
 

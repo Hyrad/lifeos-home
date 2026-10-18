@@ -22,6 +22,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
+import { winePageURL } from "./modules";
 
 // Public navigation allowlist. Only generic labels and destinations belong here.
 // Source: the existing Notion Home and Life Command Center; never a data export.
@@ -47,14 +48,40 @@ export interface Destination {
   tone: "mint" | "blue" | "lilac" | "amber" | "rose";
 }
 
-// Selected links listed in Notion Home, not a live list or a progress report.
-export const projects: Destination[] = [
+export interface ProjectTool {
+  title: string;
+  kind: "Software product" | "Tracker" | "Web workspace";
+  // Only a verified, approved app URL belongs here. Otherwise use its project.
+  href?: string;
+}
+
+export interface ProjectDestination extends Destination {
+  workspaceKind: "Project" | "Life domain";
+  tools: ProjectTool[];
+}
+
+// Selected canonical workspaces, not a live list or a progress report.
+// Git tracking is a classification, not a repository/deployment health check.
+export const projects: ProjectDestination[] = [
+  {
+    title: "Wine Production",
+    description: "Your personal winemaking workspace.",
+    href: notion("472be780ce1a8247b9ed8166a00fb5ad"),
+    icon: Wine,
+    tone: "rose",
+    workspaceKind: "Life domain",
+    tools: [
+      { title: "Wine Production", kind: "Web workspace", href: winePageURL },
+    ],
+  },
   {
     title: "Game Shelf",
     description: "Your personal game library.",
     href: notion("3f4be780ce1a8159bc09ebca662327dc"),
     icon: Gamepad2,
     tone: "lilac",
+    workspaceKind: "Project",
+    tools: [{ title: "Game Shelf", kind: "Software product" }],
   },
   {
     title: "Travel planning",
@@ -62,6 +89,8 @@ export const projects: Destination[] = [
     href: notion("3cbbe780ce1a8113bfd6f89a48a2e9ec"),
     icon: Plane,
     tone: "blue",
+    workspaceKind: "Project",
+    tools: [{ title: "Travel tracker", kind: "Tracker" }],
   },
   {
     title: "Fitness",
@@ -69,6 +98,8 @@ export const projects: Destination[] = [
     href: notion("3eabe780ce1a81a8b710d9cb3fbf53f0"),
     icon: Dumbbell,
     tone: "mint",
+    workspaceKind: "Project",
+    tools: [],
   },
 ];
 

@@ -72,6 +72,33 @@ try {
       await page.locator(".release-version").textContent(),
       `v${version}`,
     );
+    const projects = page.locator("#projects");
+    assert.equal(await projects.getByRole("article").count(), 4);
+    assert.equal(await projects.locator(".tool-link").count(), 3);
+    const game = projects.getByRole("article", {
+      name: "Game Shelf workspace",
+    });
+    assert.equal(await game.locator(".project-kind").textContent(), "Project");
+    assert.equal(
+      await game.locator(".tool-kind").textContent(),
+      "Software product",
+    );
+    assert.equal(
+      await game.locator(".tool-link").getAttribute("href"),
+      await game.locator(".project-entry").getAttribute("href"),
+    );
+    assert.match(
+      await game.locator(".tool-action").innerText(),
+      /Access through project/,
+    );
+    assert.equal(
+      await projects
+        .getByRole("article", { name: "Travel planning workspace" })
+        .locator(".tool-title")
+        .textContent(),
+      "Travel tracker",
+    );
+    assert.equal(await projects.locator("a a").count(), 0);
     const input = page.getByRole("searchbox", { name: "Find a life domain" });
     await input.fill(" MUSIC ");
     assert.equal(await page.locator("#domains .domain-card").count(), 1);
@@ -145,7 +172,9 @@ try {
     assert.equal(new URL(page.url()).hash, "#methods");
   }
   await page.goto(url, { waitUntil: "networkidle" });
-  await page.getByRole("heading", { name: "Make room for what matters." }).waitFor();
+  await page
+    .getByRole("heading", { name: "Make room for what matters." })
+    .waitFor();
   await page.keyboard.press("Tab");
   assert.equal(
     await page
