@@ -144,7 +144,8 @@ try {
       .waitFor();
     assert.equal(new URL(page.url()).hash, "#methods");
   }
-  await page.goto(url);
+  await page.goto(url, { waitUntil: "networkidle" });
+  await page.getByRole("heading", { name: "Make room for what matters." }).waitFor();
   await page.keyboard.press("Tab");
   assert.equal(
     await page
