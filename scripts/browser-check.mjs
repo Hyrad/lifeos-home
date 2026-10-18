@@ -19,6 +19,9 @@ try {
   const failedRequests = [];
   const externalRequests = [];
   page.on("pageerror", (error) => errors.push(error.message));
+  page.on("console", (message) => {
+    if (message.type() === "error") errors.push(message.text());
+  });
   page.on("requestfailed", (request) => failedRequests.push(request.url()));
   page.on("response", (response) => {
     if (response.status() >= 400)
