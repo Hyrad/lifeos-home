@@ -2,6 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
+import { homePagePath, winePagePath } from "./data/wine";
 import {
   domains,
   projects,
@@ -105,7 +106,10 @@ describe("LifeOS navigation edition", () => {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#"))
         expect(document.getElementById(href.slice(1))).not.toBeNull();
-      else {
+      else if (href.startsWith(homePagePath)) {
+        expect([homePagePath, winePagePath]).toContain(href);
+        expect(link).not.toHaveAttribute("target");
+      } else {
         expect(approved.has(href)).toBe(true);
         expect(link).toHaveAttribute("target", "_blank");
         expect(link).toHaveAttribute("rel", "noopener noreferrer");

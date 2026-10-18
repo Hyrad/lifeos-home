@@ -1,10 +1,13 @@
 import assert from "node:assert/strict";
-import { mkdir } from "node:fs/promises";
+import { mkdir, readFile } from "node:fs/promises";
 import { chromium } from "playwright";
 import AxeBuilder from "@axe-core/playwright";
 
 // Run against a production preview or the deployed GitHub Pages site.
 const url = process.env.CHECK_URL || "http://127.0.0.1:4173/lifeos-home/";
+const { version } = JSON.parse(
+  await readFile(new URL("../package.json", import.meta.url), "utf8"),
+);
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.BROWSER_CHANNEL
@@ -78,11 +81,58 @@ try {
     await input.fill("no result");
     await page.getByRole("button", { name: "Show all domains" }).click();
     assert.equal(await input.inputValue(), "");
+    // Follow the actual Home card, then verify the standalone page and reload.
+    await page.locator('#projects a[href$="/wine/"]').click();
+    await page
+      .getByRole("heading", { level: 1, name: "Wine Production." })
+      .waitFor();
+    assert.equal(new URL(page.url()).pathname, new URL("wine/", url).pathname);
+    assert.equal(await page.locator(".wine-card").count(), 6);
+    assert.equal(
+      await page.locator(".release-version").textContent(),
+      `v${version}`,
+    );
+    assert.equal(
+      await page.evaluate(
+        () => document.documentElement.scrollWidth <= innerWidth,
+      ),
+      true,
+      `${name}: wine page overflow`,
+    );
+    const wineAccessibility = await new AxeBuilder({ page })
+      .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
+      .analyze();
+    assert.deepEqual(
+      wineAccessibility.violations.map((item) => ({
+        id: item.id,
+        nodes: item.nodes.map((node) => node.target),
+      })),
+      [],
+      `${name}: wine accessibility`,
+    );
+    await page.screenshot({
+      path: `test-results/wine-${name}.png`,
+      fullPage: true,
+    });
+    await page.reload({ waitUntil: "networkidle" });
+    await page
+      .getByRole("heading", { level: 1, name: "Wine Production." })
+      .waitFor();
+    await page.getByRole("link", { name: "Back to LifeOS Home" }).click();
+    await page
+      .getByRole("heading", { name: "Make room for what matters." })
+      .waitFor();
     console.log(
-      `${name}: layout, domain interactions, WCAG A/AA checks passed`,
+      `${name}: Home and Wine layout, navigation/reload, interactions, WCAG A/AA checks passed`,
     );
   }
   // Check actual keyboard focus from a fresh page, including skip-link behavior.
+  await page.goto(new URL("wine/index.html", url).href, {
+    waitUntil: "networkidle",
+  });
+  await page
+    .getByRole("heading", { level: 1, name: "Wine Production." })
+    .waitFor();
   await page.goto(url);
   await page.keyboard.press("Tab");
   assert.equal(

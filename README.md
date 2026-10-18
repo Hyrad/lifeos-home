@@ -1,8 +1,10 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 1.0 is a **navigation edition**: open a destination and continue in its original app.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 1.1.0 is a **navigation edition**: open a destination and continue in its original app.
 
-**Intended GitHub Pages URL:** https://hyrad.github.io/lifeos-home/
+**Live site:** https://hyrad.github.io/lifeos-home/
+
+**Wine Production:** https://hyrad.github.io/lifeos-home/wine/
 
 ## Included
 
@@ -13,6 +15,7 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 - Searchable life domains, expandable on all devices.
 - Quick actions that open the original apps. Create and save there.
 - System overview with explicit disconnected/unmonitored labels.
+- Wine Production workspace: one Home card and a dedicated page with six activity sections, shared navigation, and a route back to Home.
 
 Includes keyboard navigation, focus indicators, a skip link, reduced-motion support, and responsive layouts. The device date refreshes while open. It is not a data freshness indicator.
 
@@ -41,7 +44,7 @@ pnpm exec playwright install chromium
 pnpm test:browser
 ```
 
-Alternatively set `BROWSER_CHANNEL=chrome` to use an installed Chrome. `CHECK_URL` can point to the published site. The check covers desktop (1440px), tablet (820px), phone (390px), and small phone (320px), domain interactions, keyboard entry, overflow, automated WCAG A/AA rules, browser errors, and unexpected network requests. Screenshots are saved to ignored `test-results/`. Automated rules complement visual review; they are not a full accessibility audit.
+Alternatively set `BROWSER_CHANNEL=chrome` to use an installed Chrome. `CHECK_URL` can point to the published Home URL. The check covers desktop (1440px), tablet (820px), phone (390px), and small phone (320px), domain interactions, Home → Wine → Home navigation, direct Wine page reloads, keyboard entry, overflow, automated WCAG A/AA rules, browser errors, and unexpected network requests. Screenshots are saved to ignored `test-results/`. Automated rules complement visual review; they are not a full accessibility audit.
 
 ## Canonical sources
 
@@ -54,6 +57,14 @@ The public allowlist is `src/data/navigation.ts`, reviewed on 2026-10-18. Every 
 Update links only after verifying them within the Life Command Center boundary. Change `navigationReviewed` only after an actual review. This site does not verify destination freshness, authentication, project activity, connection health, deployment health, or automation execution. Private destinations may require Notion access; this page grants none. Do not publish those pages to make links work.
 
 ## Privacy and separation
+
+### Wine Production publication scope
+
+The wine module's allowlist is `src/data/wine.ts`. On 2026-10-18 the user explicitly approved public exposure of three additional entry-point URLs: the canonical wine register, Wine Batch Management guide, and Wine Production Drive folder. The Wine Making Area and shared Tasks entry point were already part of the dashboard's navigation. Individual batch records, dated actions, inventory, original media, postmortems and exploratory-idea deep links are excluded. History opens the original register; Ideas opens the existing Wine Making Area. Neither is a fabricated filtered view.
+
+The three Notion destinations were fetched within the Life Command Center boundary. Drive metadata confirmed the Wine Production folder is directly beneath the canonical Life OS Drive root. This verifies its identity and placement; it does not assert public accessibility or inspect/change sharing permissions. No original files were moved, no source records reconciled, and no additional Notion Surface or database created.
+
+The site builds actual HTML entry points for `/lifeos-home/` and `/lifeos-home/wine/`, so direct visits, refresh, and `/wine/index.html` work on GitHub Pages without SPA fallback routing. Shared components and the package version keep both pages consistent. The module remains in the current repository for this first navigation release.
 
 Treat source, build, and GitHub Pages as public, even with a private repository.
 
@@ -78,8 +89,13 @@ The workflow uses the generated `GITHUB_TOKEN`: read-only contents in the build 
 ```text
 src/data/navigation.ts      Public labels and destination allowlist
 src/App.tsx                Dashboard and interactions
+src/WinePage.tsx           Wine Production navigation page
+src/components/Shared.tsx  Shared page navigation, header, footer, and UI
+src/data/wine.ts           Approved wine entry points and activity sections
 src/styles.css             Responsive dark theme
+src/wine.css               Wine page and Home card styling
 src/App.test.tsx           Behavioral and boundary tests
+src/WinePage.test.tsx       Module navigation and approved-link tests
 .github/workflows/pages.yml Tests, build, deployment
 ```
 
