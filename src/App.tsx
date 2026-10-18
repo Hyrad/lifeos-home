@@ -31,6 +31,7 @@ import {
   surfaces,
 } from "./data/navigation";
 import type { Destination } from "./data/navigation";
+import { version } from "../package.json";
 
 function External({
   href,
@@ -209,7 +210,7 @@ export default function App() {
             <div>
               Personal workspace
               <small>
-                LifeOS Home <span>v1.0</span>
+                LifeOS Home <span>v{version}</span>
               </small>
             </div>
           </div>
@@ -223,10 +224,13 @@ export default function App() {
             <span className="breadcrumb-slash">/</span>
             <span>Home</span>
           </div>
-          <span className="mode-badge">
-            <span />
-            Navigation edition
-          </span>
+          <div className="release-info">
+            <span className="mode-badge">
+              <span />
+              Navigation edition
+            </span>
+            <span className="release-version" title="App version">v{version}</span>
+          </div>
         </header>
         <main id="main" tabIndex={-1}>
           <section
@@ -578,7 +582,7 @@ export default function App() {
           <footer>
             <div className="footer-wordmark">
               <Compass size={15} aria-hidden="true" />
-              LifeOS Home <span>v1.0</span>
+              LifeOS Home <span>v{version}</span>
             </div>
             <p>Personal life, with a little more intention.</p>
             <External href={sources.root}>

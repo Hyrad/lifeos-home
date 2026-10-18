@@ -260,6 +260,17 @@ section[id] {
 .breadcrumb {
   color: #9ba6aa;
 }
+.topbar > .release-info {
+  gap: 12px;
+  flex-shrink: 0;
+}
+.release-version {
+  color: var(--mint);
+  font-size: 11px;
+  font-weight: 500;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
 .breadcrumb-slash {
   color: #69757b;
 }
@@ -1249,6 +1260,9 @@ footer > a:hover {
   }
 }
 @media (max-width: 700px) {
+  .release-info .mode-badge {
+    display: none;
+  }
   main {
     padding: 26px 20px 14px;
   }
