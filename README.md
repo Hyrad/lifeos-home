@@ -1,10 +1,12 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 1.1.0 is a **navigation edition**: open a destination and continue in its original app.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 1.1.1 is a **navigation edition**: open a destination and continue in its original app.
 
 **Live site:** https://hyrad.github.io/lifeos-home/
 
-**Wine Production:** https://hyrad.github.io/lifeos-home/wine/
+**Independent Wine Production site:** https://hyrad.github.io/lifeos-wine-production/
+
+**Wine repository:** https://github.com/Hyrad/lifeos-wine-production
 
 ## Included
 
@@ -15,7 +17,7 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 - Searchable life domains, expandable on all devices.
 - Quick actions that open the original apps. Create and save there.
 - System overview with explicit disconnected/unmonitored labels.
-- Wine Production workspace: one Home card and a dedicated page with six activity sections, shared navigation, and a route back to Home.
+- Wine Production entry: one Home card and sidebar link to the independent Wine Production site.
 
 Includes keyboard navigation, focus indicators, a skip link, reduced-motion support, and responsive layouts. The device date refreshes while open. It is not a data freshness indicator.
 
@@ -58,13 +60,11 @@ Update links only after verifying them within the Life Command Center boundary. 
 
 ## Privacy and separation
 
-### Wine Production publication scope
+### Independent module boundary
 
-The wine module's allowlist is `src/data/wine.ts`. On 2026-10-18 the user explicitly approved public exposure of three additional entry-point URLs: the canonical wine register, Wine Batch Management guide, and Wine Production Drive folder. The Wine Making Area and shared Tasks entry point were already part of the dashboard's navigation. Individual batch records, dated actions, inventory, original media, postmortems and exploratory-idea deep links are excluded. History opens the original register; Ideas opens the existing Wine Making Area. Neither is a fabricated filtered view.
+Wine Production is independently maintained and deployed from [Hyrad/lifeos-wine-production](https://github.com/Hyrad/lifeos-wine-production). Home contains only its published URL and navigation card. No wine page components, guide/register/Drive allowlist, wine records, or wine application styles are built here. The visual card follows Home styles. Wine releases do not require a Home release.
 
-The three Notion destinations were fetched within the Life Command Center boundary. Drive metadata confirmed the Wine Production folder is directly beneath the canonical Life OS Drive root. This verifies its identity and placement; it does not assert public accessibility or inspect/change sharing permissions. No original files were moved, no source records reconciled, and no additional Notion Surface or database created.
-
-The site builds actual HTML entry points for `/lifeos-home/` and `/lifeos-home/wine/`, so direct visits, refresh, and `/wine/index.html` work on GitHub Pages without SPA fallback routing. Shared components and the package version keep both pages consistent. The module remains in the current repository for this first navigation release.
+The old `/lifeos-home/wine/` and `/lifeos-home/wine/index.html` addresses are compatibility redirects. They preserve query strings and section anchors through an external script compatible with the production content-security policy. A visible fallback link and JavaScript-disabled meta redirect are included. Old source remains in Git history as provenance; it is removed from the current application.
 
 Treat source, build, and GitHub Pages as public, even with a private repository.
 
@@ -89,13 +89,13 @@ The workflow uses the generated `GITHUB_TOKEN`: read-only contents in the build 
 ```text
 src/data/navigation.ts      Public labels and destination allowlist
 src/App.tsx                Dashboard and interactions
-src/WinePage.tsx           Wine Production navigation page
 src/components/Shared.tsx  Shared page navigation, header, footer, and UI
-src/data/wine.ts           Approved wine entry points and activity sections
+src/data/modules.ts        Independent module URLs
 src/styles.css             Responsive dark theme
-src/wine.css               Wine page and Home card styling
 src/App.test.tsx           Behavioral and boundary tests
-src/WinePage.test.tsx       Module navigation and approved-link tests
+src/ModuleNavigation.test.tsx Independent module navigation checks
+wine/index.html             Compatibility redirect for old bookmarks
+wine/redirect.ts            Redirect preserves query and section anchor
 .github/workflows/pages.yml Tests, build, deployment
 ```
 

@@ -34,7 +34,7 @@ import {
   Topbar,
   Footer,
 } from "./components/Shared";
-import { winePagePath } from "./data/wine";
+import { winePageURL } from "./data/modules";
 
 function useLocalDate() {
   const [date, setDate] = useState(() => new Date());
@@ -225,7 +225,7 @@ export default function App() {
               </External>
             </SectionHeading>
             <div className="project-grid">
-              <a href={winePagePath} className="project-card wine-home-card">
+              <a href={winePageURL} className="project-card wine-home-card">
                 <div className="card-top">
                   <IconBox icon={Wine} tone="rose" />
                   <ArrowUpRight

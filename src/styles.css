@@ -1673,3 +1673,22 @@ footer > a:hover {
     animation: none !important;
   }
 }
+
+/* Independent module entry card; module styles live in its own repository. */
+.wine-home-card {
+  border-color: #634448;
+  background: linear-gradient(140deg, #312326, #191e21 80%);
+}
+.wine-home-card:hover {
+  border-color: #bd8c8b;
+  background: linear-gradient(140deg, #3b292d, #202629 80%);
+}
+.wine-home-card .private-label {
+  color: #e2bdb4;
+}
+
+@media (min-width: 1200px) {
+  .project-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}

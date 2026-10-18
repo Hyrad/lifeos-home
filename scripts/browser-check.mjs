@@ -8,6 +8,8 @@ const url = process.env.CHECK_URL || "http://127.0.0.1:4173/lifeos-home/";
 const { version } = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
+const wineURL = "https://hyrad.github.io/lifeos-wine-production/";
+const allowedOrigins = new Set([new URL(url).origin, new URL(wineURL).origin]);
 const browser = await chromium.launch({
   headless: true,
   ...(process.env.BROWSER_CHANNEL
@@ -31,7 +33,7 @@ try {
       errors.push(`${response.status()}: ${response.url()}`);
   });
   page.on("request", (request) => {
-    if (new URL(request.url()).origin !== new URL(url).origin)
+    if (!allowedOrigins.has(new URL(request.url()).origin))
       externalRequests.push(request.url());
   });
   for (const [name, width, height] of [
@@ -66,6 +68,10 @@ try {
       `${name}: accessibility violations`,
     );
     await page.screenshot({ path: `test-results/${name}.png`, fullPage: true });
+    assert.equal(
+      await page.locator(".release-version").textContent(),
+      `v${version}`,
+    );
     const input = page.getByRole("searchbox", { name: "Find a life domain" });
     await input.fill(" MUSIC ");
     assert.equal(await page.locator("#domains .domain-card").count(), 1);
@@ -82,15 +88,15 @@ try {
     await page.getByRole("button", { name: "Show all domains" }).click();
     assert.equal(await input.inputValue(), "");
     // Follow the actual Home card, then verify the standalone page and reload.
-    await page.locator('#projects a[href$="/wine/"]').click();
+    await page.locator(`#projects a[href="${wineURL}"]`).click();
     await page
       .getByRole("heading", { level: 1, name: "Wine Production." })
       .waitFor();
-    assert.equal(new URL(page.url()).pathname, new URL("wine/", url).pathname);
+    assert.equal(new URL(page.url()).pathname, new URL(wineURL).pathname);
     assert.equal(await page.locator(".wine-card").count(), 6);
-    assert.equal(
+    assert.match(
       await page.locator(".release-version").textContent(),
-      `v${version}`,
+      /^v\d+\.\d+\.\d+$/,
     );
     assert.equal(
       await page.evaluate(
@@ -127,12 +133,17 @@ try {
     );
   }
   // Check actual keyboard focus from a fresh page, including skip-link behavior.
-  await page.goto(new URL("wine/index.html", url).href, {
-    waitUntil: "networkidle",
-  });
-  await page
-    .getByRole("heading", { level: 1, name: "Wine Production." })
-    .waitFor();
+  for (const oldPath of ["wine/", "wine/index.html"]) {
+    const legacy = new URL(oldPath, url);
+    legacy.search = "?from=legacy";
+    legacy.hash = "methods";
+    await page.goto(legacy.href, { waitUntil: "networkidle" });
+    await page.waitForURL(wineURL + "?from=legacy#methods");
+    await page
+      .getByRole("heading", { level: 1, name: "Wine Production." })
+      .waitFor();
+    assert.equal(new URL(page.url()).hash, "#methods");
+  }
   await page.goto(url);
   await page.keyboard.press("Tab");
   assert.equal(

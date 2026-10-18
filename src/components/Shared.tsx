@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { version } from "../../package.json";
 import { sources } from "../data/navigation";
-import { homePagePath, winePagePath } from "../data/wine";
+import { winePageURL } from "../data/modules";
 
 export function External({
   href,
@@ -87,15 +87,13 @@ const navItems = [
 export function Sidebar({
   active,
   onNavigate,
-  isWine = false,
 }: {
   active: string;
   onNavigate?: (id: string) => void;
-  isWine?: boolean;
 }) {
   return (
     <aside className="sidebar" aria-label="LifeOS navigation">
-      <a className="brand" href={isWine ? homePagePath : "#today"}>
+      <a className="brand" href="#today">
         <span className="brand-mark">
           <Compass size={23} strokeWidth={1.5} aria-hidden="true" />
         </span>
@@ -109,7 +107,7 @@ export function Sidebar({
         {navItems.map(({ id, label, icon: Icon }) => (
           <a
             key={id}
-            href={isWine ? `${homePagePath}#${id}` : `#${id}`}
+            href={`#${id}`}
             className={active === id ? "nav-item selected" : "nav-item"}
             aria-current={active === id ? "location" : undefined}
             onClick={() => onNavigate?.(id)}
@@ -119,13 +117,9 @@ export function Sidebar({
             {active === id && <span className="nav-dot" />}
           </a>
         ))}
-        <a
-          href={winePagePath}
-          className={isWine ? "nav-item selected" : "nav-item"}
-          aria-current={isWine ? "page" : undefined}
-        >
+        <a href={winePageURL} className="nav-item">
           <Wine size={18} strokeWidth={1.7} aria-hidden="true" />
-          Wine Production{isWine && <span className="nav-dot" />}
+          Wine Production
         </a>
       </nav>
       <div className="sidebar-bottom">
@@ -155,25 +149,15 @@ export function Sidebar({
     </aside>
   );
 }
-export function Topbar({ wine = false }: { wine?: boolean }) {
+export function Topbar() {
   return (
     <header className="topbar">
       <div>
-        {wine ? (
-          <>
-            <a className="breadcrumb" href={homePagePath}>
-              LifeOS Home
-            </a>
-            <span className="breadcrumb-slash">/</span>
-            <span>Wine Production</span>
-          </>
-        ) : (
-          <>
-            <span className="breadcrumb">Personal workspace</span>
-            <span className="breadcrumb-slash">/</span>
-            <span>Home</span>
-          </>
-        )}
+        <>
+          <span className="breadcrumb">Personal workspace</span>
+          <span className="breadcrumb-slash">/</span>
+          <span>Home</span>
+        </>
       </div>
       <div className="release-info">
         <span className="mode-badge">
