@@ -106,8 +106,8 @@ describe("LifeOS navigation edition", () => {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#"))
         expect(document.getElementById(href.slice(1))).not.toBeNull();
-      else if (href === winePageURL || href.startsWith(homePagePath)) {
-        expect([homePagePath, winePageURL]).toContain(href);
+      else if (href === winePageURL || href === "https://hyrad-lifeos-health.newpeach71.chatgpt.site" || href.startsWith(homePagePath)) {
+        expect([homePagePath, winePageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site"]).toContain(href);
         expect(link).not.toHaveAttribute("target");
       } else {
         expect(approved.has(href)).toBe(true);

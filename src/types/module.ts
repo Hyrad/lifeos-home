@@ -5,7 +5,7 @@ export interface ModuleDefinition {
   contextURL: string;
   launchURL?: string;
   access: "public-navigation" | "authenticated";
-  icon: "wine";
+  icon: "wine" | "health";
   tone: Tone;
 }
 export interface SectionNavigation { id: string; label: string }
