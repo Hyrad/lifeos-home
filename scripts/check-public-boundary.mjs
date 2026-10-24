@@ -10,6 +10,7 @@ async function scan(dir) {
     assert.doesNotMatch(text, /(?:sb_secret_|sb_service_role_|ghp_|github_pat_|sk_live_)[A-Za-z0-9_]+|-----BEGIN (?:RSA |OPENSSH )?PRIVATE KEY-----/);
     // React includes standards/documentation URLs; these are not navigation destinations.
     for (const url of text.match(/https:\/\/[^\s"'<>`\\)]+/g) || []) {
+      if (approved.has(url)) continue;
       if (/^https:\/\/(?:react\.dev\/errors\/|app\.notion\.com\/p\/|hyrad\.github\.io\/|calendar\.google\.com\/)/.test(url)) {
         if (!url.startsWith("https://react.dev/errors/") && !/^https:\/\/app\.notion\.com\/p\/\$\{[a-zA-Z]+\}$/.test(url)) assert.ok(approved.has(url), `Unapproved destination ${url}`);
       } else assert.ok(url.startsWith("https://" ) && /^(https:\/\/(?:www\.w3\.org|developer\.mozilla\.org|react\.dev)\/)/.test(url), `Unexpected URL ${url}`);
