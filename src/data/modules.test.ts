@@ -1,0 +1,16 @@
+import { describe, it, expect } from "vitest";
+import { modules, moduleDestination } from "./modules";
+describe("module contract", () => {
+  it("has unique IDs and only approved public destinations", () => {
+    expect(new Set(modules.map(m => m.id)).size).toBe(modules.length);
+    for (const m of modules) {
+      expect(m.access).toBe("public-navigation");
+      expect(new URL(m.contextURL).origin).toBe("https://app.notion.com");
+      expect(moduleDestination(m)).toBe("https://hyrad.github.io/lifeos-wine-production/");
+    }
+  });
+  it("falls back to context when no launch URL exists", () => {
+    const { launchURL: _, ...m } = modules[0];
+    expect(moduleDestination(m)).toBe(m.contextURL);
+  });
+});

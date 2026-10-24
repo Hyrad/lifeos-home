@@ -22,7 +22,7 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { winePageURL } from "./modules";
+import { modules, winePageURL } from "./modules";
 
 // Public navigation allowlist. Only generic labels and destinations belong here.
 // Source: the existing Notion Home and Life Command Center; never a data export.
@@ -66,7 +66,7 @@ export const projects: ProjectDestination[] = [
   {
     title: "Wine Production",
     description: "Your personal winemaking workspace.",
-    href: notion("472be780ce1a8247b9ed8166a00fb5ad"),
+    href: modules[0].contextURL,
     icon: Wine,
     tone: "rose",
     workspaceKind: "Life domain",

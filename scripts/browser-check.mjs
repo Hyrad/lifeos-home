@@ -55,6 +55,18 @@ try {
       true,
       `${name}: horizontal overflow`,
     );
+    if (width <= 700) {
+      const toggle = page.getByRole("button", { name: "Quick navigation" });
+      await toggle.click();
+      await page.keyboard.press("Escape");
+      assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+      assert.equal(await toggle.evaluate(el => el === document.activeElement), true);
+      await toggle.click();
+      await page.getByRole("navigation", { name: "Page sections" }).getByRole("link", { name: "Projects" }).click();
+      assert.equal(new URL(page.url()).hash, "#projects");
+      await page.reload({ waitUntil: "networkidle" });
+      await page.getByRole("heading", { name: "Make room for what matters." }).waitFor();
+    }
     const accessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
@@ -120,7 +132,7 @@ try {
       .getByRole("heading", { level: 1, name: "Wine Production." })
       .waitFor();
     assert.equal(new URL(page.url()).pathname, new URL(wineURL).pathname);
-    assert.equal(await page.locator(".wine-card").count(), 6);
+    assert.equal(await page.locator(".wine-card").count(), 8);
     assert.match(
       await page.locator(".release-version").textContent(),
       /^v\d+\.\d+\.\d+$/,

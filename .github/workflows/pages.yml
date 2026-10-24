@@ -34,6 +34,20 @@ jobs:
         run: pnpm test
       - name: Typecheck and build
         run: pnpm build
+      - name: Check public artifact boundary
+        run: pnpm test:boundary
+      - name: Install browser runtime
+        run: pnpm exec playwright install --with-deps chromium
+      - name: Check production preview
+        run: |
+          pnpm preview > /tmp/lifeos-preview.log 2>&1 &
+          PREVIEW_PID=$!
+          trap 'kill "$PREVIEW_PID"' EXIT
+          for attempt in $(seq 1 30); do
+            if curl --fail --silent http://127.0.0.1:4173/lifeos-home/ > /dev/null; then break; fi
+            sleep 1
+          done
+          pnpm test:browser
       - name: Upload Pages artifact
         if: github.event_name != 'pull_request'
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5

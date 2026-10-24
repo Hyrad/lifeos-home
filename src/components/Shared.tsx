@@ -1,3 +1,4 @@
+import { ModuleNavigation } from "./ModuleNavigation";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -7,11 +8,9 @@ import {
   House,
   Layers3,
   ShieldCheck,
-  Wine,
 } from "lucide-react";
 import { version } from "../../package.json";
 import { sources } from "../data/navigation";
-import { winePageURL } from "../data/modules";
 
 export function External({
   href,
@@ -117,10 +116,7 @@ export function Sidebar({
             {active === id && <span className="nav-dot" />}
           </a>
         ))}
-        <a href={winePageURL} className="nav-item">
-          <Wine size={18} strokeWidth={1.7} aria-hidden="true" />
-          Wine Production
-        </a>
+        <ModuleNavigation />
       </nav>
       <div className="sidebar-bottom">
         <div className="workspace-note">

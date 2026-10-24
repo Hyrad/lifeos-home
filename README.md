@@ -105,3 +105,7 @@ wine/redirect.ts            Redirect preserves query and section anchor
 ```
 
 Change Tasks, Projects, Areas, Notes, Reviews, Calendar, and automations in their original systems. This page is a convenience window, not a second personal database.
+
+## Foundation v0.1
+
+Home 0.2.0 introduces a typed public module registry, reusable shell, semantic tokens and accessible mobile section navigation. See [foundation conventions](docs/foundation-v0.1.md). Run `pnpm test:boundary` after building. CI now runs production browser checks before artifact upload. Independent modules retain their own releases.
