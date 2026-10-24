@@ -1,7 +1,7 @@
 {
   "name": "lifeos-home",
   "private": true,
-  "version": "0.1.2",
+  "version": "0.2.0",
   "type": "module",
   "packageManager": "pnpm@11.25.0",
   "engines": {
@@ -13,7 +13,8 @@
     "preview": "vite preview --host 127.0.0.1",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:browser": "node scripts/browser-check.mjs"
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:boundary": "node scripts/check-public-boundary.mjs"
   },
   "dependencies": {
     "lucide-react": "^1.59.0",

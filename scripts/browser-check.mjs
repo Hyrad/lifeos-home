@@ -55,6 +55,31 @@ try {
       true,
       `${name}: horizontal overflow`,
     );
+    if (width <= 700) {
+      const toggle = page.getByRole("button", { name: "Quick navigation" });
+      await toggle.click();
+      await page.keyboard.press("Escape");
+      assert.equal(await toggle.getAttribute("aria-expanded"), "false");
+      assert.equal(await toggle.evaluate(el => el === document.activeElement), true);
+      await toggle.click();
+      await page.getByRole("navigation", { name: "Page sections" }).getByRole("link", { name: "Projects" }).click();
+      assert.equal(new URL(page.url()).hash, "#projects");
+      await page.reload({ waitUntil: "networkidle" });
+      await page.getByRole("heading", { name: "Make room for what matters." }).waitFor();
+    }
+    const manifestURL = await page.locator('link[rel="manifest"]').getAttribute("href");
+    const appManifest = await page.evaluate(async href => {
+      const response = await fetch(href);
+      if (!response.ok) throw new Error("Manifest unavailable");
+      return response.json();
+    }, manifestURL);
+    assert.equal(appManifest.display, "standalone");
+    assert.equal(appManifest.scope, "/lifeos-home/");
+    for (const icon of appManifest.icons) {
+      const response = await page.request.get(new URL(icon.src, new URL(manifestURL, url)).href);
+      assert.equal(response.status(), 200);
+      assert.match(response.headers()["content-type"], /image\/png/);
+    }
     const accessibility = await new AxeBuilder({ page })
       .withTags(["wcag2a", "wcag2aa", "wcag21aa"])
       .analyze();
@@ -120,7 +145,7 @@ try {
       .getByRole("heading", { level: 1, name: "Wine Production." })
       .waitFor();
     assert.equal(new URL(page.url()).pathname, new URL(wineURL).pathname);
-    assert.equal(await page.locator(".wine-card").count(), 6);
+    assert.equal(await page.locator(".wine-card").count(), 8);
     assert.match(
       await page.locator(".release-version").textContent(),
       /^v\d+\.\d+\.\d+$/,

@@ -105,3 +105,13 @@ wine/redirect.ts            Redirect preserves query and section anchor
 ```
 
 Change Tasks, Projects, Areas, Notes, Reviews, Calendar, and automations in their original systems. This page is a convenience window, not a second personal database.
+
+## Foundation v0.1
+
+Home 0.2.0 introduces a typed public module registry, reusable shell, semantic tokens and accessible mobile section navigation. See [foundation conventions](docs/foundation-v0.1.md). Run `pnpm test:boundary` after building. CI now runs production browser checks before artifact upload. Independent modules retain their own releases.
+
+## iPhone Home Screen app
+
+After this release is deployed, open https://hyrad.github.io/lifeos-home/ in Safari. Choose Share → Add to Home Screen, enable Open as Web App, name it LifeOS, and tap Add. You can move its icon into a LifeOS folder alongside future independent modules. This is an installed web app, not an App Store package. iPhone installation and safe-area rendering still require device verification.
+
+The manifest has a stable ID and scope restricted to /lifeos-home/. Icons derive from the existing LifeOS compass mark. Home opens in a standalone window; external Notion and module destinations retain their own access and browser behavior. This release has no service worker, offline guarantee, push notifications or private-data cache. Changes become available from the deployed site without an App Store update.

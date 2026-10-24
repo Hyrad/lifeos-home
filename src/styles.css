@@ -1,3 +1,4 @@
+@import url("./styles/tokens.css");
 @import url("./typography.css");
 
 .home-identity {
@@ -20,12 +21,7 @@
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
   color-scheme: dark;
-  --bg: #101316;
-  --panel: #181c20;
-  --line: #2a3034;
-  --muted: #a1aaae;
-  --mint: #b9f2d5;
-  --text: #e9eded;
+
 }
 * {
   box-sizing: border-box;
@@ -56,7 +52,7 @@ button:focus-visible,
 a:focus-visible,
 input:focus-visible,
 summary:focus-visible {
-  outline: 2px solid var(--mint);
+  outline: 2px solid var(--focus-color);
   outline-offset: 5px;
 }
 button {
@@ -1763,4 +1759,21 @@ footer > a:hover {
   .project-grid {
     grid-template-columns: repeat(4, minmax(0, 1fr));
   }
+}
+
+.mobile-section-nav { display: none; }
+@media (max-width: 700px) {
+  .mobile-section-nav { display: block; padding: var(--space-md) 20px 0; }
+  .mobile-section-nav button, .mobile-section-nav a {
+    min-height: 44px; padding: 12px; border-radius: var(--radius-control);
+  }
+  .mobile-section-nav button { background: var(--panel); border: 1px solid var(--line); }
+  .mobile-section-nav nav { padding: var(--space-sm) 0; }
+  .mobile-section-nav a { display: block; }
+}
+
+/* iPhone standalone window: keep controls clear of cutouts and the home indicator. */
+@media (display-mode: standalone) {
+  body { padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  .app-shell { padding-left: env(safe-area-inset-left, 0px); padding-right: env(safe-area-inset-right, 0px); }
 }
