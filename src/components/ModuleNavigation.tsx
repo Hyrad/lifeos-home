@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from "react";
-import { Wine } from "lucide-react";
+import { Wine, HeartPulse } from "lucide-react";
 import { modules, moduleDestination, homeSections } from "../data/modules";
-const icons = { wine: Wine };
+const icons = { wine: Wine, health: HeartPulse };
 export function ModuleNavigation() {
   return <>{modules.map(module => {
     const Icon = icons[module.icon];

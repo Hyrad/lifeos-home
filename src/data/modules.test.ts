@@ -4,9 +4,9 @@ describe("module contract", () => {
   it("has unique IDs and only approved public destinations", () => {
     expect(new Set(modules.map(m => m.id)).size).toBe(modules.length);
     for (const m of modules) {
-      expect(m.access).toBe("public-navigation");
+      expect(["public-navigation", "authenticated"]).toContain(m.access);
       expect(new URL(m.contextURL).origin).toBe("https://app.notion.com");
-      expect(moduleDestination(m)).toBe("https://hyrad.github.io/lifeos-wine-production/");
+      expect(["https://hyrad.github.io/lifeos-wine-production/", "https://hyrad-lifeos-health.newpeach71.chatgpt.site"]).toContain(moduleDestination(m));
     }
   });
   it("falls back to context when no launch URL exists", () => {
