@@ -1,0 +1,26 @@
+{
+  "id": "/lifeos-home/",
+  "name": "LifeOS Home",
+  "short_name": "LifeOS",
+  "description": "Your personal LifeOS dashboard.",
+  "lang": "en",
+  "start_url": "/lifeos-home/",
+  "scope": "/lifeos-home/",
+  "display": "standalone",
+  "background_color": "#101316",
+  "theme_color": "#101316",
+  "icons": [
+    {
+      "src": "icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}

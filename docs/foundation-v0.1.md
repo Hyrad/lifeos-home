@@ -21,3 +21,7 @@ Node 24 and pnpm 11.25.0: install --frozen-lockfile; test; build; test:boundary;
 ## Migration and rollback
 
 No data, storage, Notion schema, permission, URL or independent-module migration. Legacy wine entries preserve query/hash. Before any approved release record the then-current production commit/workflow. Roll back with a revert commit and normal Pages workflow; verify version, navigation and both legacy redirects at four sizes. Never force-push for rollback. Merge and deployment require review of the completed PR.
+
+## iPhone installation extension
+
+Authorized follow-up: installable Home Screen dashboard. Static manifest, 180px Apple touch icon and 192/512px PNG icons, standalone metadata and safe-area styling. Stable start URL, ID and scope are /lifeos-home/. No service worker or new persistence is introduced. Domain modules remain independently installable in later work; this change covers Home only. Production publication remains subject to the existing review gate.

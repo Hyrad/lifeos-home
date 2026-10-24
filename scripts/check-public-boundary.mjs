@@ -32,6 +32,17 @@ for (const path of ["dist/index.html", "dist/wine/index.html"]) {
  assert.doesNotMatch(t, /<script(?![^>]*\bsrc=)[^>]*>|<style\b|\sstyle=/i);
 }
 const root = await readdir("dist");
-assert.deepEqual(root.sort(), ["assets", "favicon.svg", "index.html", "wine"]);
+assert.deepEqual(root.sort(), ["assets", "favicon.svg", "icons", "index.html", "manifest.webmanifest", "wine"]);
 assert.deepEqual(await readdir("dist/wine"), ["index.html"]);
 console.log("Public artifact checks passed; manual content review remains required.");
+
+const manifest = JSON.parse(await readFile("dist/manifest.webmanifest", "utf8"));
+assert.equal(manifest.display, "standalone");
+assert.equal(manifest.start_url, "/lifeos-home/");
+assert.equal(manifest.scope, "/lifeos-home/");
+assert.deepEqual((await readdir("dist/icons")).sort(), ["apple-touch-icon.png", "icon-192.png", "icon-512.png"]);
+for (const icon of manifest.icons) {
+ assert.match(icon.src, /^icons\/icon-(192|512)\.png$/);
+ const bytes = await readFile(`dist/${icon.src}`);
+ assert.equal(bytes.subarray(1,4).toString(), "PNG");
+}
