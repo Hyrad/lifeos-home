@@ -13,7 +13,7 @@ export function ProjectCard({ item }: { item: ProjectDestination }) {
         <p>{item.description}</p>
         <span className="project-access">
           <LockKeyhole size={12} aria-hidden="true" />
-          Open in Notion
+          Find in Notion
           <ArrowUpRight size={14} aria-hidden="true" />
         </span>
       </External>
@@ -30,8 +30,8 @@ export function ProjectCard({ item }: { item: ProjectDestination }) {
                     <GitBranch size={12} aria-hidden="true" /> Git-tracked
                   </span>{" "}
                   <span className="tool-action">
-                    {tool.href ? "Open workspace" : "Access through project"}
-                    <ArrowUpRight size={13} aria-hidden="true" />
+                    {tool.href ? "Open workspace" : "Private hosting pending"}
+                    {tool.href && <ArrowUpRight size={13} aria-hidden="true" />}
                   </span>
                 </>
               );
@@ -42,9 +42,7 @@ export function ProjectCard({ item }: { item: ProjectDestination }) {
                       {content}
                     </a>
                   ) : (
-                    <External href={item.href} className="tool-link">
-                      {content}
-                    </External>
+                    <div className="tool-link tool-unavailable">{content}</div>
                   )}
                 </li>
               );

@@ -2,7 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import { homePagePath, winePageURL } from "./data/modules";
+import { journeyPageURL, winePageURL } from "./data/modules";
 import {
   domains,
   projects,
@@ -23,6 +23,8 @@ describe("LifeOS navigation edition", () => {
     for (const heading of [
       "Today, with a little clarity.",
       "Upcoming",
+      "Apps",
+      "Workstreams",
       "Active-project links",
       "Find your flow",
       "Life domains",
@@ -43,8 +45,8 @@ describe("LifeOS navigation edition", () => {
       screen.getByText("This page doesn’t run or check automations."),
     ).toBeVisible();
     expect(
-      screen.getByRole("link", { name: /Open today in Notion/ }),
-    ).toHaveAttribute("href", sources.home);
+      screen.getByRole("link", { name: /Open Notion for today/ }),
+    ).toHaveAttribute("href", sources.notion);
     expect(
       screen.getByRole("link", { name: /^Open Google Calendar/ }),
     ).toHaveAttribute("href", sources.calendar);
@@ -106,8 +108,7 @@ describe("LifeOS navigation edition", () => {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#"))
         expect(document.getElementById(href.slice(1))).not.toBeNull();
-      else if (href === winePageURL || href === "https://hyrad-lifeos-health.newpeach71.chatgpt.site" || href.startsWith(homePagePath)) {
-        expect([homePagePath, winePageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site"]).toContain(href);
+      else if (href === winePageURL || href === journeyPageURL) {
         expect(link).not.toHaveAttribute("target");
       } else {
         expect(approved.has(href)).toBe(true);

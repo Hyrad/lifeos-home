@@ -1,7 +1,7 @@
 import { render, screen, within } from "@testing-library/react";
 import { describe, expect, it } from "vitest";
 import App from "./App";
-import { winePageURL } from "./data/modules";
+import { journeyPageURL, notionLauncherURL, winePageURL } from "./data/modules";
 
 describe("Independent module navigation", () => {
   it("links the Home card and sidebar to the separately deployed wine site", () => {
@@ -20,30 +20,40 @@ describe("Independent module navigation", () => {
     expect(card).not.toHaveAttribute("target");
   });
 
+  it("separates public launches and the private workstream directory", () => {
+    render(<App />);
+    const apps = within(screen.getByRole("region", { name: "Apps" }));
+    expect(apps.getAllByRole("link").map(link => link.getAttribute("href"))).toEqual([winePageURL, journeyPageURL]);
+    const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
+    expect(workstreams.getByRole("heading", { name: "Music" })).toBeVisible();
+    expect(workstreams.getByRole("heading", { name: "Game Shelf" })).toBeVisible();
+    expect(workstreams.getAllByRole("link")).toHaveLength(1);
+    expect(workstreams.getByRole("link", { name: /Open Notion/ })).toHaveAttribute("href", notionLauncherURL);
+  });
+
   it("keeps projects distinct from their software and uses honest access routes", () => {
     render(<App />);
     const game = screen.getByRole("article", { name: "Game Shelf workspace" });
     expect(within(game).getByText("Project")).toBeVisible();
     expect(within(game).getByText("Software product")).toBeVisible();
     expect(within(game).getByText("Git-tracked")).toBeVisible();
-    const project = within(game).getByRole("link", { name: /Open in Notion/ });
-    expect(
-      within(game).getByRole("link", { name: /Access through project/ }),
-    ).toHaveAttribute("href", project.getAttribute("href"));
+    expect(within(game).getByRole("link", { name: /Find in Notion/ })).toHaveAttribute("href", notionLauncherURL);
+    expect(within(game).getByText("Private hosting pending")).toBeVisible();
+    expect(within(game).queryByRole("link", { name: /Software product/ })).not.toBeInTheDocument();
 
     const travel = screen.getByRole("article", {
       name: "Travel planning workspace",
     });
-    expect(within(travel).getByText("Travel tracker")).toBeVisible();
+    expect(within(travel).getByText("Journey Tracker")).toBeVisible();
     expect(within(travel).getByText("Tracker", { exact: true })).toBeVisible();
-    expect(within(travel).getByText("Access through project")).toBeVisible();
+    expect(within(travel).getByRole("link", { name: /^Journey Tracker/ })).toHaveAttribute("href", journeyPageURL);
 
     const wine = screen.getByRole("article", {
       name: "Wine Production workspace",
     });
     expect(within(wine).getByText("Life domain")).toBeVisible();
     expect(
-      within(wine).getByRole("link", { name: /Open in Notion/ }),
+      within(wine).getByRole("link", { name: /Find in Notion/ }),
     ).not.toHaveAttribute("href", winePageURL);
     expect(within(wine).getByText("Web workspace")).toBeVisible();
 

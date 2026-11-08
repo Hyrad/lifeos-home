@@ -18,12 +18,12 @@ import {
 } from "lucide-react";
 import {
   domains,
-  navigationReviewed,
   projects,
   quickActions,
   sources,
   surfaces,
 } from "./data/navigation";
+import { NavigationDirectory } from "./components/NavigationDirectory";
 import { ProjectCard } from "./components/ProjectCard";
 import { AppShell } from "./components/AppShell";
 import {
@@ -119,8 +119,8 @@ export default function App() {
                     Pick up your current tasks and choose what deserves your
                     attention.
                   </p>
-                  <External href={sources.home} className="button primary">
-                    Open today in Notion{" "}
+                  <External href={sources.notion} className="button primary">
+                    Open Notion for today{" "}
                     <ArrowUpRight size={16} aria-hidden="true" />
                   </External>
                 </div>
@@ -177,6 +177,8 @@ export default function App() {
             </section>
           </div>
 
+          <NavigationDirectory />
+
           <section
             className="section"
             id="projects"
@@ -185,22 +187,20 @@ export default function App() {
             <SectionHeading
               id="projects-title"
               title="Active-project links"
-              subtitle="Open a project for context, or its software and tools to get things done."
+              subtitle="Find project context in Notion or launch available software."
             >
-              <External href={sources.projects} className="text-link secondary">
-                All projects <ArrowUpRight size={14} aria-hidden="true" />
+              <External href={sources.notion} className="text-link secondary">
+                Find projects in Notion <ArrowUpRight size={14} aria-hidden="true" />
               </External>
             </SectionHeading>
             <div className="project-grid">
               {projects.map((item) => (
-                <ProjectCard key={item.href} item={item} />
+                <ProjectCard key={item.title} item={item} />
               ))}
             </div>
             <p className="source-note">
               <Link2 size={12} aria-hidden="true" />
-              Navigation snapshot · reviewed {navigationReviewed} · Git-tracked
-              identifies software, not live status. Private details stay at
-              source.
+              Git-tracked identifies software. Find private project records through your Notion workspace.
             </p>
           </section>
 
@@ -212,16 +212,17 @@ export default function App() {
             <SectionHeading
               id="surfaces-title"
               title="Find your flow"
-              subtitle="Familiar Surfaces. The original records, right where they belong."
+              subtitle="Find these working surfaces in your Notion workspace."
             >
               <span className="section-kicker">SURFACES</span>
             </SectionHeading>
             <div className="surface-grid">
               {surfaces.map((item) => (
                 <External
-                  key={item.href}
+                  key={item.title}
                   href={item.href}
                   className="surface-card"
+                  aria-label={`Find ${item.title} in Notion (opens in a new tab)`}
                 >
                   <IconBox icon={item.icon} tone={item.tone} />
                   <div>
@@ -230,7 +231,7 @@ export default function App() {
                     </h3>
                     <p>{item.description}</p>
                     <span className="surface-identity">
-                      Surface type: {item.type} · Domain: {item.domain}
+                      {item.type} · {item.domain}
                     </span>
                   </div>
                 </External>
@@ -271,9 +272,10 @@ export default function App() {
               <div className="domain-grid">
                 {visibleDomains.map((item) => (
                   <External
-                    key={item.href}
+                    key={item.title}
                     href={item.href}
                     className="domain-card"
+                      aria-label={`Find ${item.title} in Notion (opens in a new tab)`}
                   >
                     <IconBox icon={item.icon} tone={item.tone} small />
                     <span>{item.title}</span>
@@ -408,10 +410,10 @@ export default function App() {
                 require sign-in.
               </span>
               <External
-                href={sources.governance}
+                href={sources.notion}
                 className="text-link secondary"
               >
-                Surface governance <ArrowUpRight size={13} aria-hidden="true" />
+                Find LifeOS governance in Notion <ArrowUpRight size={13} aria-hidden="true" />
               </External>
             </div>
           </section>
