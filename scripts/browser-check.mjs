@@ -9,6 +9,8 @@ const { version } = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
 const journeyURL = "https://hyrad.github.io/journey-tracker/";
+const healthURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
+const calendarURL = "https://calendar.google.com/";
 const notionURL = "https://app.notion.com/login";
 const wineURL = "https://hyrad.github.io/lifeos-wine-production/";
 const allowedOrigins = new Set([new URL(url).origin, new URL(wineURL).origin]);
@@ -83,11 +85,25 @@ try {
       assert.equal(await link.getAttribute("aria-current"), "location");
     }
     const apps = page.getByRole("region", { name: "Apps" });
-    for (const [label, href] of [["Wine Production", wineURL], ["Journey Tracker", journeyURL]]) {
+    for (const [label, href] of [["Wine Production", wineURL], ["Journey Tracker", journeyURL], ["Health", healthURL]]) {
       const launch = apps.getByRole("link", { name: new RegExp(`^Open ${label}`) });
       assert.equal(await launch.getAttribute("href"), href);
       assert.equal(await launch.getAttribute("target"), null);
       assert.ok((await launch.boundingBox()).height >= 44, `${name}: ${label} touch target`);
+    }
+    assert.match(await apps.getByRole("link", { name: /^Open Health/ }).innerText(), /Sign-in required/);
+    if (width > 700) {
+      const health = directoryNav.getByRole("link", { name: "Health", exact: true });
+      assert.equal(await health.getAttribute("href"), healthURL);
+      assert.equal(await health.getAttribute("target"), null);
+    }
+    for (const calendar of [
+      page.locator("#upcoming").getByRole("link", { name: /^Open Google Calendar/ }),
+      page.locator("#actions").getByRole("link", { name: /^Plan your time/ }),
+    ]) {
+      assert.equal(await calendar.getAttribute("href"), calendarURL);
+      assert.equal(await calendar.getAttribute("target"), "_blank");
+      assert.equal(await calendar.getAttribute("rel"), "noopener noreferrer");
     }
     const workstreams = page.getByRole("region", { name: "Workstreams" });
     const privateFallback = workstreams.getByRole("link", { name: /^Open Notion/ });

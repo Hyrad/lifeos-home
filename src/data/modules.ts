@@ -2,6 +2,7 @@ import type { ModuleDefinition } from "../types/module";
 
 export const winePageURL = "https://hyrad.github.io/lifeos-wine-production/";
 export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
+export const healthAppURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
 export const notionLauncherURL = "https://app.notion.com/login";
 
 const reviewedOn = "2026-11-08";
@@ -52,8 +53,9 @@ export const navigationManifest = {
       id: "health", label: "Health", description: "Personal wellbeing.",
       domain: "Wellbeing", icon: "health", tone: "mint", status: "active",
       canonical: { owner: "area", role: "area", route: privateRecord },
-      application: privateApp, related: ["fitness"],
-      evidence: "Health owner and shared module directory",
+      application: { ...privateApp, route: { visibility: "approved-authenticated-launch", url: healthAppURL } },
+      placement: ["apps", "workstreams"], related: ["fitness"],
+      evidence: "Health owner and approved Home v0.2.1 app launch",
     },
     {
       ...directoryEntry,
@@ -129,7 +131,10 @@ export const modules: readonly ModuleDefinition[] = navigationManifest.modules;
 
 export function publicLaunchURL(module: ModuleDefinition) {
   const app = module.application;
-  return app?.status === "live" && app.route.visibility === "public-safe" ? app.route.url : undefined;
+  if (app?.status !== "live") return undefined;
+  if (app.route.visibility === "public-safe" || app.route.visibility === "approved-authenticated-launch") {
+    return app.route.url;
+  }
 }
 
 export const homeSections = [

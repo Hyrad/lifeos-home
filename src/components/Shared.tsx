@@ -1,4 +1,4 @@
-import { homeSections, winePageURL } from "../data/modules";
+import { healthAppURL, homeSections, winePageURL } from "../data/modules";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -6,6 +6,7 @@ import {
   Compass,
   Grid2X2,
   House,
+  HeartPulse,
   Layers3,
   Workflow,
   AppWindow,
@@ -120,6 +121,9 @@ export function Sidebar({
         })}
         <a href={winePageURL} className="nav-item">
           <Wine size={18} strokeWidth={1.7} aria-hidden="true" />Wine Production
+        </a>
+        <a href={healthAppURL} className="nav-item">
+          <HeartPulse size={18} strokeWidth={1.7} aria-hidden="true" />Health
         </a>
       </nav>
       <div className="sidebar-bottom">

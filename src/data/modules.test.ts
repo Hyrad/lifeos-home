@@ -22,17 +22,19 @@ describe("public navigation manifest", () => {
     }
   });
 
-  it("has HTTPS public app launches only and never serializes restricted URLs", () => {
+  it("exposes only approved app launch URLs and keeps canonical records private", () => {
     const allowed = [
       "https://hyrad.github.io/lifeos-wine-production/",
       "https://hyrad.github.io/journey-tracker/",
+      "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
     ];
     const launches = [];
     for (const module of modules) {
       const launch = publicLaunchURL(module);
       expect(module.placement.includes("apps")).toBe(Boolean(launch));
+      expect(module.canonical.route).not.toHaveProperty("url");
       for (const route of [module.application?.route, module.canonical.route]) {
-        if (route?.visibility === "public-safe") {
+        if (route?.visibility === "public-safe" || route?.visibility === "approved-authenticated-launch") {
           const url = new URL(route.url);
           expect(url.protocol).toBe("https:");
           expect(url.username + url.password + url.search + url.hash).toBe("");
@@ -44,13 +46,18 @@ describe("public navigation manifest", () => {
       if (launch) launches.push(launch);
     }
     expect(launches).toEqual(allowed);
-    expect(JSON.stringify(navigationManifest)).not.toMatch(/notion\.(?:so|com)\/p\/|chatgpt\.site|[a-f\d]{32}/i);
+    const health = modules.find(module => module.id === "health");
+    expect(health?.application).toMatchObject({
+      status: "live",
+      route: { visibility: "approved-authenticated-launch", url: allowed[2] },
+    });
+    expect(JSON.stringify(navigationManifest).replaceAll(allowed[2], "")).not.toMatch(/notion\.(?:so|com)\/p\/|chatgpt\.site|[a-f\d]{32}/i);
   });
 
   it("keeps a generic fallback for restricted and absent launch routes", () => {
-    const health = modules.find(module => module.id === "health")!;
+    const music = modules.find(module => module.id === "music")!;
     const cooking = modules.find(module => module.id === "cooking")!;
-    for (const module of [health, cooking]) {
+    for (const module of [music, cooking]) {
       expect(publicLaunchURL(module)).toBeUndefined();
       expect(module.fallback).toBe("notion-launcher");
     }

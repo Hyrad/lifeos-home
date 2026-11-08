@@ -2,14 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import { journeyPageURL, winePageURL } from "./data/modules";
-import {
-  domains,
-  projects,
-  quickActions,
-  sources,
-  surfaces,
-} from "./data/navigation";
+import { domains, sources } from "./data/navigation";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -97,21 +90,23 @@ describe("LifeOS navigation edition", () => {
   });
   it("uses only approved destinations, valid anchors, and safe external links", () => {
     render(<App />);
-    const approved = new Set([
-      ...Object.values(sources),
-      ...domains.map((item) => item.href),
-      ...projects.map((item) => item.href),
-      ...surfaces.map((item) => item.href),
-      ...quickActions.map((item) => item.href),
+    const sameTab = new Set([
+      "https://hyrad.github.io/lifeos-wine-production/",
+      "https://hyrad.github.io/journey-tracker/",
+      "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
+    ]);
+    const newTab = new Set([
+      "https://app.notion.com/login",
+      "https://calendar.google.com/",
     ]);
     for (const link of screen.getAllByRole("link")) {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#"))
         expect(document.getElementById(href.slice(1))).not.toBeNull();
-      else if (href === winePageURL || href === journeyPageURL) {
+      else if (sameTab.has(href)) {
         expect(link).not.toHaveAttribute("target");
       } else {
-        expect(approved.has(href)).toBe(true);
+        expect(newTab.has(href)).toBe(true);
         expect(link).toHaveAttribute("target", "_blank");
         expect(link).toHaveAttribute("rel", "noopener noreferrer");
         expect(link).toHaveAccessibleName(/opens in a new tab/);

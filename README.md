@@ -1,6 +1,6 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. The navigation edition opens public applications and points users toward their existing private workspace.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. The navigation edition opens approved applications and points users toward their existing private workspace.
 
 **Live site:** https://hyrad.github.io/lifeos-home/
 
@@ -10,7 +10,7 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 
 ## Included
 
-- **Apps** launches Wine Production and Journey Tracker from Home in two interactions or fewer.
+- **Apps** launches Wine Production, Journey Tracker and Health from Home in two interactions or fewer. Health requires its own owner sign-in.
 - **Workstreams** lists modules and canonical record roles. The generic Notion entry opens Notion sign-in or the existing session so the owner can open their private LifeOS Home.
 - Today, Projects, Upcoming, Surfaces, searchable Life domains, Quick actions and System overview retain their existing Home sections. Private links use the generic Notion entry point. Calendar and public app links still launch directly.
 - Keyboard navigation, focus indicators, a skip link, reduced-motion support, responsive layouts and a device-local date.
@@ -56,7 +56,7 @@ Treat source, build, and GitHub Pages as public, even with a private repository.
 
 - No private tasks, appointments, personal financial/health records, family records, receipts, or source documents.
 - No secrets, `.env` files, Notion API client, live integration, analytics, third-party fonts, or browser storage.
-- Public source and build contain only approved public routes and generic module labels. Keep private destinations and record IDs in Notion.
+- Public source and build contain approved launch URLs and generic module labels. The exact Health app launch URL is approved for this use. Keep private Notion destinations and unapproved app URLs in the owner records.
 - Personal-only: no business or employment records, links, or copied implementation systems.
 - Restrictive HTML content security and no-referrer policies. External links use `noopener noreferrer`.
 

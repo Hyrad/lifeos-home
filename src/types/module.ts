@@ -19,7 +19,7 @@ export interface ModuleDefinition {
   application?: {
     status: "live" | "planned" | "blocked" | "unverified";
     installation: "standalone-manifest" | "browser-shortcut" | "unverified";
-    route: PublicationRoute;
+    route: PublicationRoute | { visibility: "approved-authenticated-launch"; url: string };
   };
   placement: readonly ("apps" | "workstreams")[];
   related?: readonly string[];

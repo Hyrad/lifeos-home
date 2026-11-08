@@ -1,11 +1,14 @@
 import { readdir, readFile } from "node:fs/promises";
 import assert from "node:assert/strict";
 
+// Home v0.2.1 approved this exact address. The app still enforces owner access.
+const approvedHealthLaunch = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
 const approved = new Set([
   "https://app.notion.com/login",
   "https://calendar.google.com/",
   "https://hyrad.github.io/lifeos-wine-production/",
   "https://hyrad.github.io/journey-tracker/",
+  approvedHealthLaunch,
 ]);
 const standardURLs = new Set([
   "http://www.w3.org/1998/Math/MathML",
@@ -20,11 +23,12 @@ const privateReferences = /notion\.(?:com|so)\/p\/|\b[a-f0-9]{32}\b|\b[a-f0-9]{8
 async function scan(path) {
   const text = await readFile(path, "utf8");
   assert.ok(!secrets.test(text), `Credential pattern in ${path}`);
-  assert.ok(!privateReferences.test(text), `Private reference pattern in ${path}`);
-  for (const url of text.match(/https?:\/\/[^\s"'<>\x60\\)]+/g) ?? []) {
+  const remaining = text.replace(/https?:\/\/[^\s"'<>\x60\\)]+/g, (url) => {
     // Bundled framework code includes React errors and standard XML/SVG namespaces.
     assert.ok(approved.has(url) || standardURLs.has(url), `Unexpected URL in ${path}`);
-  }
+    return url === approvedHealthLaunch ? "" : url;
+  });
+  assert.ok(!privateReferences.test(remaining), `Private reference pattern in ${path}`);
   if (path.endsWith(".html")) {
     assert.match(text, /Content-Security-Policy/);
     assert.doesNotMatch(text, /<script(?![^>]*\bsrc=)[^>]*>|<style\b|\sstyle=/i);

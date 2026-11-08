@@ -240,14 +240,14 @@ export const domains: Destination[] = [
 export const quickActions: Destination[] = [
   {
     title: "Add a task",
-    description: "Open Tasks in Notion",
+    description: "Find Tasks in your Notion workspace",
     href: sources.notion,
     icon: ListChecks,
     tone: "mint",
   },
   {
     title: "Capture a thought",
-    description: "Open Notes & Memory",
+    description: "Find Notes & Memory in your Notion workspace",
     href: sources.notion,
     icon: Lightbulb,
     tone: "amber",
@@ -261,7 +261,7 @@ export const quickActions: Destination[] = [
   },
   {
     title: "Take a step back",
-    description: "Open Reviews in Notion",
+    description: "Find Reviews in your Notion workspace",
     href: sources.notion,
     icon: BookOpen,
     tone: "lilac",

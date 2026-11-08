@@ -15,7 +15,7 @@ export function NavigationDirectory() {
   return (
     <>
       <section className="section" id="apps" aria-labelledby="apps-title">
-        <SectionHeading id="apps-title" title="Apps" subtitle="Launch a public LifeOS application." />
+        <SectionHeading id="apps-title" title="Apps" subtitle="Open a LifeOS app. Some apps require sign-in." />
         <div className="surface-grid">
           {modules.filter(module => module.placement.includes("apps")).map(module => {
             const url = publicLaunchURL(module);
@@ -25,7 +25,7 @@ export function NavigationDirectory() {
                 <IconBox icon={icons[module.icon]} tone={module.tone} />
                 <div>
                   <h3>Open {module.label} <ArrowUpRight size={14} aria-hidden="true" /></h3>
-                  <p>{module.description}</p>
+                  <p>{module.description} {module.application?.route.visibility === "approved-authenticated-launch" && "Sign-in required."}</p>
                 </div>
               </a>
             );
@@ -36,7 +36,7 @@ export function NavigationDirectory() {
         <SectionHeading
           id="workstreams-title"
           title="Workstreams"
-          subtitle="Find project records and working surfaces by module. Sign in to Notion and open LifeOS Home to reach your private records."
+          subtitle="Open Notion, then find LifeOS Home in your workspace. Use the directory below to identify the record to look for."
         />
         <External href={notionLauncherURL} className="button directory-notion">
           Open Notion <ArrowUpRight size={16} aria-hidden="true" />

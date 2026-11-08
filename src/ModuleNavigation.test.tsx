@@ -20,10 +20,27 @@ describe("Independent module navigation", () => {
     expect(card).not.toHaveAttribute("target");
   });
 
-  it("separates public launches and the private workstream directory", () => {
+  it("keeps the exact approved Health launch in the sidebar and Apps", () => {
+    render(<App />);
+    const healthURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
+    const sidebar = within(screen.getByRole("navigation", { name: "Main navigation" }));
+    const apps = within(screen.getByRole("region", { name: "Apps" }));
+    for (const launch of [
+      sidebar.getByRole("link", { name: "Health" }),
+      apps.getByRole("link", { name: /^Open Health/ }),
+    ]) {
+      expect(launch).toHaveAttribute("href", healthURL);
+      expect(launch).not.toHaveAttribute("target");
+    }
+    expect(apps.getByText(/Sign-in required/)).toBeVisible();
+  });
+
+  it("separates approved launches and the private workstream directory", () => {
     render(<App />);
     const apps = within(screen.getByRole("region", { name: "Apps" }));
-    expect(apps.getAllByRole("link").map(link => link.getAttribute("href"))).toEqual([winePageURL, journeyPageURL]);
+    expect(apps.getByRole("link", { name: /^Open Wine Production/ })).toHaveAttribute("href", winePageURL);
+    expect(apps.getByRole("link", { name: /^Open Journey Tracker/ })).toHaveAttribute("href", journeyPageURL);
+    expect(apps.getAllByRole("link")).toHaveLength(3);
     const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
     expect(workstreams.getByRole("heading", { name: "Music" })).toBeVisible();
     expect(workstreams.getByRole("heading", { name: "Game Shelf" })).toBeVisible();

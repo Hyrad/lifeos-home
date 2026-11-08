@@ -8,12 +8,36 @@ Home v0.3.0 keeps the public dashboard on GitHub Pages. Notion owns canonical pe
 | --- | --- | --- |
 | Wine Production | Direct public app, standalone manifest | Private Notion workspace |
 | Journey Tracker | Direct public app, standalone manifest | Private Notion workspace |
-| Health, Music, CasinoAcademy | Private app links held in owner records | Private Notion workspace |
+| Health | Previously approved exact launch URL. Owner sign-in required. | Private Notion workspace |
+| Music, CasinoAcademy | Private app links held in owner records | Private Notion workspace |
 | Game Shelf | Private hosting gate | Private development Surface |
 | Family technology, founder workspace | Launch routes withheld pending verification | Private access |
 | Fitness, Cooking, Shopping, Game development, LifeOS Home records | Directory entries | Private Notion workspace |
 
-Home itself retains its standalone manifest. Manifest metadata verifies declared intent. Device installation and external-link handling require Safari testing. Public Home offers two interactions from its entry screen to either public app, or to the generic Notion launcher. The launcher opens Notion and cannot target a private workspace or page. No individually linkable public canonical Workstream is approved in this release. The full two-interaction goal for private Workstreams requires a separate access-controlled entry point.
+Home retains its standalone manifest. Device installation and external-link handling require Safari testing. Wine, Journey Tracker and Health launch within two Home interactions. Health's own sign-in is separate. The generic Notion launcher opens Notion, where the owner must find their workspace and the relevant record. The two-interaction goal for private Workstreams remains unmet.
+
+## Navigation regression audit
+
+Compared the PR base `2681425`, original draft `31d9ead`, and revised draft. The report names destinations without repeating restricted addresses.
+
+| Entry | Base | Original draft | Revised draft |
+| --- | --- | --- | --- |
+| Health app | Direct desktop sidebar launch, owner sign-in | Removed | Same direct sidebar launch restored. Apps also exposes it on desktop and mobile with sign-in guidance. |
+| Wine app | Direct sidebar and Project tool launch | Retained and added to Apps | Retained. Both legacy Wine paths still preserve query and hash. |
+| Journey Tracker | Travel tracker tool opened the private Travel project | Direct public app in Apps and the Travel card | Direct public app retained in both places. The private project still needs manual discovery. |
+| Google Calendar | Direct in Upcoming and Quick actions | Retained | Both direct links retained. |
+| Project card context | Direct Wine Area, Game Shelf Project, Caribbean cruise Project and Fitness Project | All open generic Notion | Manual discovery remains for each. Game Shelf's former tool link also opened its Project. The tool shows that private hosting is pending. |
+| Surfaces | Direct Cookbook, Shopping Hub and Grocery shopping | All open generic Notion | Manual discovery remains for all three. |
+| Life domains | Direct Food, Home, Finance, Travel, Family, Health, Fitness, Personal planning, Music, Entertainment, Purchases & equipment, Wine production, Camping, Bicolline, Learning and Gaming | All open generic Notion | Manual discovery remains for all 16. Search and expand still work. The Health app and the private Health Area have separate routes. |
+| Notion quick actions | Direct Tasks, Notes & Memory and Reviews | All open generic Notion | Manual discovery remains. Each action names the record to find after opening Notion. |
+| Other Notion entry points | Today and sidebar opened Notion Home. Footer opened Life Command Center. Projects heading opened Projects. System overview opened Surface governance. | All open generic Notion | Manual discovery remains. The Workstreams directory explains how to find LifeOS Home. |
+| Home navigation and install | Section anchors, manifest, icons and standalone scope | Retained with new Apps and Workstreams anchors | Retained. Physical Safari and Home Screen verification is pending. |
+
+The earlier public edition included direct addresses for selected Notion records behind Notion access controls. The current classified inventory holds those routes for personal access. The revision restores the prior approval for Health's app address only. Health reports, canonical records and other restricted Site addresses stay in owner records.
+
+### Gated decision
+
+Main LifeOS needs to either approve exact Notion addresses for public navigation, where disclosure of the address is acceptable, or approve an owner-authenticated directory for restricted routes. For a private directory, decide the audience and hosting, authenticate and authorize before returning any route, and verify that each approved Workstream opens in at most two interactions from the signed-in Home entry. Until then, the public directory supports discovery and the private navigation gap remains open.
 
 ## Change a route
 

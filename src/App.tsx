@@ -346,7 +346,7 @@ export default function App() {
               </div>
               <p className="small-note action-note">
                 <ExternalLink size={12} aria-hidden="true" />
-                Shortcuts open the original app. Create and save there.
+                Notion opens your session or sign-in. Find the named record in your workspace.
               </p>
             </section>
           </div>
