@@ -18,12 +18,13 @@ import {
 } from "lucide-react";
 import {
   domains,
-  navigationReviewed,
   projects,
-  quickActions,
+  coreDestinations,
   sources,
   surfaces,
 } from "./data/navigation";
+import { routeAccessLabel } from "./data/modules";
+import { NavigationDirectory } from "./components/NavigationDirectory";
 import { ProjectCard } from "./components/ProjectCard";
 import { AppShell } from "./components/AppShell";
 import {
@@ -119,8 +120,8 @@ export default function App() {
                     Pick up your current tasks and choose what deserves your
                     attention.
                   </p>
-                  <External href={sources.home} className="button primary">
-                    Open today in Notion{" "}
+                  <External href={sources.notion} className="button primary">
+                    Open Notion for today{" "}
                     <ArrowUpRight size={16} aria-hidden="true" />
                   </External>
                 </div>
@@ -177,6 +178,8 @@ export default function App() {
             </section>
           </div>
 
+          <NavigationDirectory />
+
           <section
             className="section"
             id="projects"
@@ -185,22 +188,20 @@ export default function App() {
             <SectionHeading
               id="projects-title"
               title="Active-project links"
-              subtitle="Open a project for context, or its software and tools to get things done."
+              subtitle="Find project context in Notion or launch available software."
             >
-              <External href={sources.projects} className="text-link secondary">
-                All projects <ArrowUpRight size={14} aria-hidden="true" />
+              <External href={sources.notion} className="text-link secondary">
+                Find projects in Notion <ArrowUpRight size={14} aria-hidden="true" />
               </External>
             </SectionHeading>
             <div className="project-grid">
               {projects.map((item) => (
-                <ProjectCard key={item.href} item={item} />
+                <ProjectCard key={item.title} item={item} />
               ))}
             </div>
             <p className="source-note">
               <Link2 size={12} aria-hidden="true" />
-              Navigation snapshot · reviewed {navigationReviewed} · Git-tracked
-              identifies software, not live status. Private details stay at
-              source.
+              Git-tracked identifies software. Find private project records through your Notion workspace.
             </p>
           </section>
 
@@ -212,25 +213,26 @@ export default function App() {
             <SectionHeading
               id="surfaces-title"
               title="Find your flow"
-              subtitle="Familiar Surfaces. The original records, right where they belong."
+              subtitle="Find these working surfaces in your Notion workspace."
             >
               <span className="section-kicker">SURFACES</span>
             </SectionHeading>
             <div className="surface-grid">
               {surfaces.map((item) => (
                 <External
-                  key={item.href}
+                  key={item.title}
                   href={item.href}
                   className="surface-card"
+                  aria-label={`${item.actionLabel ?? `Find ${item.title} in Notion`} (opens in a new tab)`}
                 >
                   <IconBox icon={item.icon} tone={item.tone} />
                   <div>
                     <h3>
                       {item.title} <ArrowUpRight size={14} aria-hidden="true" />
                     </h3>
-                    <p>{item.description}</p>
+                    <p>{item.actionLabel ?? item.description}</p>
                     <span className="surface-identity">
-                      Surface type: {item.type} · Domain: {item.domain}
+                      {item.type} · {item.domain}
                     </span>
                   </div>
                 </External>
@@ -271,9 +273,10 @@ export default function App() {
               <div className="domain-grid">
                 {visibleDomains.map((item) => (
                   <External
-                    key={item.href}
+                    key={item.title}
                     href={item.href}
                     className="domain-card"
+                      aria-label={`${item.actionLabel ?? `Find ${item.title} in Notion`} (opens in a new tab)`}
                   >
                     <IconBox icon={item.icon} tone={item.tone} small />
                     <span>{item.title}</span>
@@ -319,32 +322,36 @@ export default function App() {
             >
               <SectionHeading
                 id="actions-title"
-                title="Quick actions"
-                subtitle="Catch a thought. Take the next step."
+                title="Core LifeOS"
+                subtitle="Calendar opens directly. Cookbook and Shopping Hub open from Surfaces."
               />
               <div className="action-list">
-                {quickActions.map((item) => (
-                  <External
-                    href={item.href}
-                    key={item.title}
-                    className="action-row"
-                  >
-                    <IconBox icon={item.icon} tone={item.tone} small />
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.description}</p>
-                    </div>
-                    <ArrowUpRight
-                      size={15}
-                      className="outbound"
-                      aria-hidden="true"
-                    />
-                  </External>
-                ))}
+                {coreDestinations.map(({ title, icon, tone, route, linkSection }) => {
+                  const content = (
+                    <>
+                      <IconBox icon={icon} tone={tone} small />
+                      <div>
+                        <h3>{title}</h3>
+                        <p>{linkSection ? "Direct Notion link in Surfaces" : route.visibility === "public-safe" ? "Open Google Calendar" : routeAccessLabel(route)}</p>
+                      </div>
+                    </>
+                  );
+                  return route.visibility === "public-safe" && !linkSection ? (
+                    <External href={route.url} key={title} className="action-row">
+                      {content}
+                      <ArrowUpRight size={15} className="outbound" aria-hidden="true" />
+                    </External>
+                  ) : (
+                    <div key={title} className="action-row core-record">{content}</div>
+                  );
+                })}
               </div>
+              <External href={sources.notion} className="button directory-notion">
+                Open Notion to find records <ArrowUpRight size={16} aria-hidden="true" />
+              </External>
               <p className="small-note action-note">
                 <ExternalLink size={12} aria-hidden="true" />
-                Shortcuts open the original app. Create and save there.
+                After opening Notion, find the record in your workspace.
               </p>
             </section>
           </div>
@@ -374,7 +381,7 @@ export default function App() {
                     Navigation{" "}
                     <span className="status-pill available">Available</span>
                   </h3>
-                  <p>Curated links to existing personal destinations.</p>
+                  <p>Approved apps open directly. Private records show their access status.</p>
                 </div>
               </div>
               <div className="system-item">
@@ -408,10 +415,10 @@ export default function App() {
                 require sign-in.
               </span>
               <External
-                href={sources.governance}
+                href={sources.notion}
                 className="text-link secondary"
               >
-                Surface governance <ArrowUpRight size={13} aria-hidden="true" />
+                Find LifeOS governance in Notion <ArrowUpRight size={13} aria-hidden="true" />
               </External>
             </div>
           </section>

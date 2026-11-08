@@ -1,10 +1,6 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. Version 0.1.2 is a **navigation edition**: open a destination and continue in its original app.
-
-## Release stage
-
-Home uses the 0.x series while the dashboard is evolving; 1.0 is reserved for the mature software product. This revision is 0.1.2, following the intended 0.1.1 baseline. Earlier commits used 1.x labels prematurely; their history is retained, and this release intentionally resets the displayed/package version. Independent modules, including Wine Production, keep their own versions.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. The web app is the primary LifeOS launcher. Notion owns canonical records and specialist applications retain their own hosting.
 
 **Live site:** https://hyrad.github.io/lifeos-home/
 
@@ -14,17 +10,13 @@ Home uses the 0.x series while the dashboard is evolving; 1.0 is reserved for th
 
 ## Included
 
-- Today: opens the existing private Notion Home without copying tasks.
-- Active-project links: canonical project/domain workspaces, with a distinct **Software & tools** area inside each card. Game Shelf is a software product; Travel planning contains a travel tracker; Wine Production has an independent web workspace. Fitness has no software linked yet.
-- Git-tracked labels identify software ownership, not live repository or deployment health. Game Shelf and Travel tracker currently route through their existing project records for access; no direct app URL is asserted or guessed.
-- Upcoming: opens Google Calendar without embedding private events.
-- Existing Surfaces: Cookbook, Shopping Hub, Grocery Shopping.
-- Searchable life domains, expandable on all devices.
-- Quick actions that open the original apps. Create and save there.
-- System overview with explicit disconnected/unmonitored labels.
-- Wine Production entry: a canonical Notion domain link plus a separate web-workspace link, and a sidebar shortcut to the independent site.
+- **Apps** launches Wine Production, Journey Tracker and Health from Home in two interactions or fewer. Health requires its own owner sign-in.
+- **Workstreams** separates canonical Notion records from app launches and shows publication, access, and availability states. The generic Notion entry is a manual lookup fallback.
+- **Core LifeOS** preserves direct Calendar access and lists the six canonical Notion destinations with their access states. Its anchor remains `#actions`.
+- Desktop and mobile give Apps, Workstreams, Projects, Core LifeOS, and Life domains their own section links. Today, Upcoming, Surfaces, domain search, and System overview remain available.
+- Keyboard navigation, focus indicators, a skip link, reduced-motion support, responsive layouts and a device-local date.
 
-Includes keyboard navigation, focus indicators, a skip link, reduced-motion support, and responsive layouts. The device date refreshes while open. It is not a data freshness indicator.
+See [navigation contract and rollout](docs/navigation-v1.md) for the public/private boundary, device acceptance, and specialist-app handoffs.
 
 ## Local development
 
@@ -51,17 +43,7 @@ pnpm exec playwright install chromium
 pnpm test:browser
 ```
 
-Alternatively set `BROWSER_CHANNEL=chrome` to use an installed Chrome. `CHECK_URL` can point to the published Home URL. The check covers desktop (1440px), tablet (820px), phone (390px), and small phone (320px), domain interactions, Home → Wine → Home navigation, direct Wine page reloads, keyboard entry, overflow, automated WCAG A/AA rules, browser errors, and unexpected network requests. Screenshots are saved to ignored `test-results/`. Automated rules complement visual review; they are not a full accessibility audit.
-
-## Canonical sources
-
-- [Life Command Center](https://app.notion.com/p/3afbe780ce1a83b883d18111ca195c69): governance and bootstrap anchor.
-- [Notion LifeOS Home](https://app.notion.com/p/3f1be780ce1a81ccbd9ce0331175706f): original navigation and destination links.
-- [Surface governance](https://app.notion.com/p/3f1be780ce1a81c09529c394f5a44585): Home → Surface → canonical record. Existing ownership remains authoritative.
-
-The public allowlist is `src/data/navigation.ts`, reviewed on 2026-10-18. Every Notion destination was found beneath the Life Command Center or on its existing Home. Domain labels can use familiar short names for existing Areas. Private project labels are deliberately generalized. No travel dates, health context, family names, record summaries, or private implementation details are copied. Tool names and Git-tracked classifications are curated metadata; they do not query GitHub. Add a direct tool URL only after canonical verification and applicable publication approval; otherwise route through the existing project and label that route explicitly.
-
-Update links only after verifying them within the Life Command Center boundary. Change `navigationReviewed` only after an actual review. This site does not verify destination freshness, authentication, project activity, connection health, deployment health, or automation execution. Private destinations may require Notion access; this page grants none. Do not publish those pages to make links work.
+Alternatively set `BROWSER_CHANNEL=chrome` to use an installed Chrome. `CHECK_URL` can point to the published Home URL. The check covers 320, 390, 768, 834, 1024, 1280, and 1440px. It tests the Apps and Workstreams entry points, domain interactions, Home → Wine → Home, Wine reloads and legacy routes, keyboard focus, overflow, automated WCAG A/AA rules, and network behavior. Screenshots are saved to ignored `test-results/`. Automated rules complement visual review; they are not a full accessibility audit.
 
 ## Privacy and separation
 
@@ -75,7 +57,7 @@ Treat source, build, and GitHub Pages as public, even with a private repository.
 
 - No private tasks, appointments, personal financial/health records, family records, receipts, or source documents.
 - No secrets, `.env` files, Notion API client, live integration, analytics, third-party fonts, or browser storage.
-- Links expose destination IDs and generic categories, not their contents. Remove a link before publication if even that category or identifier is sensitive.
+- Public source and build contain approved launch URLs and generic module labels. The exact Health app launch URL is approved for this use. Keep private Notion destinations and unapproved app URLs in the owner records.
 - Personal-only: no business or employment records, links, or copied implementation systems.
 - Restrictive HTML content security and no-referrer policies. External links use `noopener noreferrer`.
 
@@ -92,10 +74,10 @@ The workflow uses the generated `GITHUB_TOKEN`: read-only contents in the build 
 ## Files
 
 ```text
-src/data/navigation.ts      Public labels and destination allowlist
+src/data/navigation.ts      Existing Home section labels and safe fallbacks
 src/App.tsx                Dashboard and interactions
 src/components/Shared.tsx  Shared page navigation, header, footer, and UI
-src/data/modules.ts        Independent module URLs
+src/data/modules.ts        Versioned public navigation projection
 src/styles.css             Responsive dark theme
 src/App.test.tsx           Behavioral and boundary tests
 src/ModuleNavigation.test.tsx Independent module navigation checks
@@ -108,7 +90,7 @@ Change Tasks, Projects, Areas, Notes, Reviews, Calendar, and automations in thei
 
 ## Foundation v0.1
 
-Home 0.2.0 introduces a typed public module registry, reusable shell, semantic tokens and accessible mobile section navigation. See [foundation conventions](docs/foundation-v0.1.md). Run `pnpm test:boundary` after building. CI now runs production browser checks before artifact upload. Independent modules retain their own releases.
+Home 0.2.0 introduced a typed public module registry, reusable shell, semantic tokens and accessible mobile section navigation. See [foundation conventions](docs/foundation-v0.1.md). Run `pnpm test:boundary` after building. CI now runs production browser checks before artifact upload. Independent modules retain their own releases.
 
 ## iPhone Home Screen app
 

@@ -1,4 +1,4 @@
-import { ModuleNavigation } from "./ModuleNavigation";
+import { healthAppURL, homeSections, winePageURL } from "../data/modules";
 import type { ReactNode } from "react";
 import type { LucideIcon } from "lucide-react";
 import {
@@ -6,7 +6,11 @@ import {
   Compass,
   Grid2X2,
   House,
+  HeartPulse,
   Layers3,
+  Workflow,
+  AppWindow,
+  Wine,
   ShieldCheck,
 } from "lucide-react";
 import { version } from "../../package.json";
@@ -75,14 +79,10 @@ export function SectionHeading({
   );
 }
 
-const navItems = [
-  { id: "today", label: "Overview", icon: House },
-  { id: "projects", label: "Projects", icon: Layers3 },
-  { id: "surfaces", label: "Surfaces", icon: Grid2X2 },
-  { id: "domains", label: "Life domains", icon: Compass },
-  { id: "system", label: "System overview", icon: ShieldCheck },
-];
-
+const sectionIcons = {
+  today: House, apps: AppWindow, workstreams: Workflow,
+  projects: Layers3, actions: Grid2X2, surfaces: Grid2X2, domains: Compass, system: ShieldCheck,
+};
 export function Sidebar({
   active,
   onNavigate,
@@ -103,20 +103,28 @@ export function Sidebar({
       </a>
       <div className="nav-label">WORKSPACE</div>
       <nav aria-label="Main navigation">
-        {navItems.map(({ id, label, icon: Icon }) => (
-          <a
-            key={id}
-            href={`#${id}`}
-            className={active === id ? "nav-item selected" : "nav-item"}
-            aria-current={active === id ? "location" : undefined}
-            onClick={() => onNavigate?.(id)}
-          >
-            <Icon size={18} strokeWidth={1.7} aria-hidden="true" />
-            {label}
-            {active === id && <span className="nav-dot" />}
-          </a>
-        ))}
-        <ModuleNavigation />
+        {homeSections.map(({ id, label }) => {
+          const Icon = sectionIcons[id];
+          return (
+            <a
+              key={id}
+              href={`#${id}`}
+              className={active === id ? "nav-item selected" : "nav-item"}
+              aria-current={active === id ? "location" : undefined}
+              onClick={() => onNavigate?.(id)}
+            >
+              <Icon size={18} strokeWidth={1.7} aria-hidden="true" />
+              {label}
+              {active === id && <span className="nav-dot" />}
+            </a>
+          );
+        })}
+        <a href={winePageURL} className="nav-item">
+          <Wine size={18} strokeWidth={1.7} aria-hidden="true" />Wine Production
+        </a>
+        <a href={healthAppURL} className="nav-item">
+          <HeartPulse size={18} strokeWidth={1.7} aria-hidden="true" />Health
+        </a>
       </nav>
       <div className="sidebar-bottom">
         <div className="workspace-note">
@@ -126,8 +134,8 @@ export function Sidebar({
             <br />
             Everything in its place.
           </p>
-          <External href={sources.home}>
-            Open Notion Home <ArrowUpRight size={14} aria-hidden="true" />
+          <External href={sources.notion}>
+            Open Notion <ArrowUpRight size={14} aria-hidden="true" />
           </External>
         </div>
         <div className="profile">
@@ -175,8 +183,8 @@ export function Footer() {
         LifeOS Home <span>v{version}</span>
       </div>
       <p>Personal life, with a little more intention.</p>
-      <External href={sources.root}>
-        Life Command Center <ArrowUpRight size={12} aria-hidden="true" />
+      <External href={sources.notion}>
+        Find LifeOS in Notion <ArrowUpRight size={12} aria-hidden="true" />
       </External>
     </footer>
   );

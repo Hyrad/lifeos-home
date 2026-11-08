@@ -2,14 +2,7 @@ import { fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, describe, expect, it, vi } from "vitest";
 import App from "./App";
-import { homePagePath, winePageURL } from "./data/modules";
-import {
-  domains,
-  projects,
-  quickActions,
-  sources,
-  surfaces,
-} from "./data/navigation";
+import { domains, sources } from "./data/navigation";
 
 afterEach(() => {
   vi.useRealTimers();
@@ -23,10 +16,12 @@ describe("LifeOS navigation edition", () => {
     for (const heading of [
       "Today, with a little clarity.",
       "Upcoming",
+      "Apps",
+      "Workstreams",
       "Active-project links",
       "Find your flow",
       "Life domains",
-      "Quick actions",
+      "Core LifeOS",
       "System overview",
     ]) {
       expect(
@@ -43,8 +38,8 @@ describe("LifeOS navigation edition", () => {
       screen.getByText("This page doesn’t run or check automations."),
     ).toBeVisible();
     expect(
-      screen.getByRole("link", { name: /Open today in Notion/ }),
-    ).toHaveAttribute("href", sources.home);
+      screen.getByRole("link", { name: /Open Notion for today/ }),
+    ).toHaveAttribute("href", sources.notion);
     expect(
       screen.getByRole("link", { name: /^Open Google Calendar/ }),
     ).toHaveAttribute("href", sources.calendar);
@@ -52,6 +47,31 @@ describe("LifeOS navigation edition", () => {
       screen.queryByText(/all systems operational/i),
     ).not.toBeInTheDocument();
   });
+  it("offers direct Calendar and a clearly separate Notion fallback in Core LifeOS", () => {
+    render(<App />);
+    const core = within(screen.getByRole("region", { name: "Core LifeOS" }));
+    expect(core.getAllByRole("link")).toHaveLength(2);
+    expect(core.getByRole("link", { name: /^Calendar/ })).toHaveAttribute("href", sources.calendar);
+    expect(core.getByRole("link", { name: /^Open Notion to find records/ })).toHaveAttribute("href", sources.notion);
+    for (const name of ["Tasks", "Projects", "Notes & Memory", "Reviews", "Cookbook", "Shopping Hub"]) {
+      expect(core.getByRole("heading", { name })).toBeVisible();
+      expect(core.queryByRole("link", { name: new RegExp(name) })).not.toBeInTheDocument();
+    }
+  });
+
+  it("opens Cookbook and Shopping Hub directly from Surfaces once each", () => {
+    render(<App />);
+    const surfaces = within(screen.getByRole("region", { name: "Find your flow" }));
+    for (const [name, url] of [
+      ["Open Cookbook", "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922"],
+      ["Open Shopping Hub", "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095"],
+    ]) {
+      expect(surfaces.getByRole("link", { name: new RegExp(name) })).toHaveAttribute("href", url);
+      expect(document.querySelectorAll(`a[href="${url}"]`)).toHaveLength(1);
+    }
+    expect(surfaces.getByRole("link", { name: /Find Grocery shopping in Notion/ })).toHaveAttribute("href", sources.notion);
+  });
+
   it("searches collapsed domains and clears an empty result", async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -95,22 +115,27 @@ describe("LifeOS navigation edition", () => {
   });
   it("uses only approved destinations, valid anchors, and safe external links", () => {
     render(<App />);
-    const approved = new Set([
-      ...Object.values(sources),
-      ...domains.map((item) => item.href),
-      ...projects.map((item) => item.href),
-      ...surfaces.map((item) => item.href),
-      ...quickActions.map((item) => item.href),
+    const sameTab = new Set([
+      "https://hyrad.github.io/lifeos-wine-production/",
+      "https://hyrad.github.io/journey-tracker/",
+      "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
+    ]);
+    const newTab = new Set([
+      "https://app.notion.com/login",
+      "https://calendar.google.com/",
+      "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad",
+      "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36",
+      "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922",
+      "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095",
     ]);
     for (const link of screen.getAllByRole("link")) {
       const href = link.getAttribute("href")!;
       if (href.startsWith("#"))
         expect(document.getElementById(href.slice(1))).not.toBeNull();
-      else if (href === winePageURL || href === "https://hyrad-lifeos-health.newpeach71.chatgpt.site" || href.startsWith(homePagePath)) {
-        expect([homePagePath, winePageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site"]).toContain(href);
+      else if (sameTab.has(href)) {
         expect(link).not.toHaveAttribute("target");
       } else {
-        expect(approved.has(href)).toBe(true);
+        expect(newTab.has(href)).toBe(true);
         expect(link).toHaveAttribute("target", "_blank");
         expect(link).toHaveAttribute("rel", "noopener noreferrer");
         expect(link).toHaveAccessibleName(/opens in a new tab/);

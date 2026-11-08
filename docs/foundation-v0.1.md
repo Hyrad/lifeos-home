@@ -4,6 +4,8 @@ Home release: 0.2.0. Home owns the navigation shell; modules own independent rep
 
 ## Module contract
 
+Historical baseline. The current contract and privacy rules are in [navigation v1](navigation-v1.md).
+
 src/types/module.ts defines stable ID, public label, approved context URL, optional launch URL, access classification and icon/tone keys. src/data/modules.ts is a curated registry, not runtime discovery or authorization. Missing launch URLs fall back to context. Preserve the distinction between a Project/Area and its software. Only previously approved Wine destinations are included.
 
 ## Interface conventions

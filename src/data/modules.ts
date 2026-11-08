@@ -1,17 +1,166 @@
-import type { ModuleDefinition, SectionNavigation } from "../types/module";
-// Curated public metadata only. Access classification is not runtime authorization.
-export const modules = [{
-  id: "wine", label: "Wine Production",
-  contextURL: "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad",
-  launchURL: "https://hyrad.github.io/lifeos-wine-production/",
-  access: "public-navigation", icon: "wine", tone: "rose",
-}, { id: "health", label: "Health", contextURL: "https://app.notion.com/p/957be780ce1a825cb7e50128aad57075", launchURL: "https://hyrad-lifeos-health.newpeach71.chatgpt.site", access: "authenticated", icon: "health", tone: "mint" }] as const satisfies readonly ModuleDefinition[];
-export const winePageURL = modules[0].launchURL;
-export const moduleDestination = (module: ModuleDefinition) => module.launchURL ?? module.contextURL;
-export const homeSections: readonly SectionNavigation[] = [
-  { id: "today", label: "Overview" }, { id: "projects", label: "Projects" },
-  { id: "surfaces", label: "Surfaces" }, { id: "domains", label: "Life domains" },
-  { id: "system", label: "System overview" },
-];
+import type { ApplicationRoute, ModuleDefinition } from "../types/module";
 
-export const homePagePath = "/lifeos-home/";
+export const winePageURL = "https://hyrad.github.io/lifeos-wine-production/";
+export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
+export const healthAppURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
+export const notionLauncherURL = "https://app.notion.com/login";
+
+// NAV-05 explicitly approved disclosure of these four exact addresses.
+export const approvedNotionRoutes = {
+  wine: { visibility: "public-safe", url: "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad" },
+  travel: { visibility: "public-safe", url: "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36" },
+  cookbook: { visibility: "public-safe", url: "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922" },
+  shopping: { visibility: "public-safe", url: "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095" },
+} as const;
+
+const reviewedOn = "2026-11-08";
+export const privateRecord = { visibility: "authenticated-only" } as const;
+export const publicationReview = { visibility: "publication-review" } as const;
+const unverifiedRoute = { visibility: "pending-review" } as const;
+
+export function routeAccessLabel(route: ApplicationRoute) {
+  return {
+    "public-safe": "Direct link available",
+    "approved-authenticated-launch": "Sign-in required",
+    "publication-review": "Direct link needs publication approval",
+    "authenticated-only": "Private link requires authenticated delivery",
+    "pending-review": "Destination unverified",
+  }[route.visibility];
+}
+const privateApp = {
+  status: "live",
+  installation: "unverified",
+  route: privateRecord,
+} as const;
+const directoryEntry = {
+  placement: ["workstreams"],
+  fallback: "notion-launcher",
+  verifiedOn: reviewedOn,
+} as const;
+
+// This is the public projection. The review inventory lives in the private
+// LifeOS checkpoint. Restricted routes here carry a classification only.
+export const navigationManifest = {
+  version: 1,
+  modules: [
+    {
+      ...directoryEntry,
+      id: "lifeos", label: "LifeOS planning & governance", description: "Shared navigation and governance.",
+      domain: "LifeOS", icon: "compass", tone: "mint", status: "active",
+      canonical: { owner: "lifeos", role: "operator window", route: privateRecord },
+      evidence: "LifeOS Home and shared module directory",
+    },
+    {
+      ...directoryEntry,
+      id: "wine", label: "Wine Production", description: "Winemaking guides and workspace.",
+      domain: "Food & drink", icon: "wine", tone: "rose", status: "active",
+      canonical: { owner: "area", role: "area", label: "Wine Making Area", route: approvedNotionRoutes.wine },
+      application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: winePageURL } },
+      placement: ["apps", "workstreams"],
+      evidence: "LifeOS Home and live GitHub Pages site and manifest",
+    },
+    {
+      ...directoryEntry,
+      id: "travel", label: "Journey Tracker", description: "Explore the published travel tracker.",
+      domain: "Travel", icon: "travel", tone: "blue", status: "active",
+      canonical: { owner: "area", role: "area", label: "Travel Area", route: approvedNotionRoutes.travel },
+      application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: journeyPageURL } },
+      placement: ["apps", "workstreams"],
+      evidence: "Travel owner and public tracker release, live site and manifest",
+    },
+    {
+      ...directoryEntry,
+      id: "health", label: "Health", description: "Personal wellbeing.",
+      domain: "Wellbeing", icon: "health", tone: "mint", status: "active",
+      canonical: { owner: "area", role: "area", label: "Health & Medical", route: privateRecord },
+      application: { ...privateApp, route: { visibility: "approved-authenticated-launch", url: healthAppURL } },
+      placement: ["apps", "workstreams"], related: ["fitness"],
+      evidence: "Health owner and approved Home v0.2.1 app launch",
+    },
+    {
+      ...directoryEntry,
+      id: "fitness", label: "Fitness", description: "Movement and training.",
+      domain: "Wellbeing", icon: "fitness", tone: "mint", status: "active",
+      canonical: { owner: "project", role: "project", route: privateRecord },
+      related: ["health"],
+      evidence: "Shared module directory",
+    },
+    {
+      ...directoryEntry,
+      id: "music", label: "Music", description: "Creative development and practice.",
+      domain: "Creative", icon: "music", tone: "amber", status: "active",
+      canonical: { owner: "project", role: "workstream", label: "Music Creative Dashboard", route: publicationReview },
+      application: privateApp,
+      evidence: "Music owner and Creative Dashboard",
+    },
+    {
+      ...directoryEntry,
+      id: "game-shelf", label: "Game Shelf", description: "Personal game library.",
+      domain: "Games", icon: "game", tone: "lilac", status: "active",
+      canonical: { owner: "project", role: "development surface", label: "Game Shelf Development", route: publicationReview },
+      application: { status: "blocked", installation: "unverified", route: unverifiedRoute },
+      evidence: "Game Shelf owner and development surface",
+    },
+    {
+      ...directoryEntry,
+      id: "family-technology", label: "Family technology", description: "Family technology projects.",
+      domain: "Home", icon: "family", tone: "rose", status: "active",
+      canonical: { owner: "project", role: "workstream", route: privateRecord },
+      application: { status: "unverified", installation: "unverified", route: unverifiedRoute },
+      evidence: "Shared module directory",
+    },
+    {
+      ...directoryEntry,
+      id: "game-development", label: "Game development", description: "Game creation and learning.",
+      domain: "Games", icon: "game", tone: "lilac", status: "planned",
+      canonical: { owner: "project", role: "project", route: privateRecord },
+      evidence: "Shared module directory",
+    },
+    {
+      ...directoryEntry,
+      id: "cooking", label: "Cooking", description: "Recipe and cooking references.",
+      domain: "Food & drink", icon: "food", tone: "amber", status: "active",
+      canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: approvedNotionRoutes.cookbook, linkSection: "surfaces" },
+      related: ["shopping"], evidence: "Cuisine owner and Cookbook",
+    },
+    {
+      ...directoryEntry,
+      id: "shopping", label: "Shopping", description: "Shopping surfaces.",
+      domain: "Home", icon: "shopping", tone: "blue", status: "active",
+      canonical: { owner: "area", role: "tracker", label: "Shopping Hub", route: approvedNotionRoutes.shopping, linkSection: "surfaces" },
+      related: ["cooking"], evidence: "LifeOS Home and Shopping Hub",
+    },
+    {
+      ...directoryEntry,
+      id: "casino-academy", label: "CasinoAcademy", description: "Casino game education project.",
+      domain: "Games", icon: "development", tone: "lilac", status: "planned",
+      canonical: { owner: "project", role: "workstream", label: "CasinoAcademy Development", route: publicationReview },
+      application: { ...privateApp, label: "Development Command Center" }, evidence: "CasinoAcademy owner and development workstream",
+    },
+    {
+      id: "founder", label: "Founder workspace", description: "Personal founder workspace.",
+      domain: "Personal", icon: "development", tone: "blue", status: "unverified",
+      canonical: { owner: "unverified", role: "unverified", route: unverifiedRoute },
+      application: { ...privateApp, route: unverifiedRoute },
+      placement: ["workstreams"], evidence: "Shared module directory and mission handoff", verifiedOn: reviewedOn,
+    },
+  ],
+} satisfies { version: number; modules: readonly ModuleDefinition[] };
+
+export const modules: readonly ModuleDefinition[] = navigationManifest.modules;
+
+export function publicLaunchURL(module: ModuleDefinition) {
+  const app = module.application;
+  if (app?.status !== "live") return undefined;
+  if (app.route.visibility === "public-safe" || app.route.visibility === "approved-authenticated-launch") {
+    return app.route.url;
+  }
+}
+
+export const homeSections = [
+  { id: "today", label: "Overview" }, { id: "apps", label: "Apps" },
+  { id: "workstreams", label: "Workstreams" }, { id: "projects", label: "Projects" },
+  { id: "actions", label: "Core LifeOS" }, { id: "domains", label: "Life domains" },
+  { id: "surfaces", label: "Surfaces" },
+  { id: "system", label: "System overview" },
+] as const;
