@@ -2,6 +2,19 @@
 
 Home v0.3.0 keeps the public dashboard on GitHub Pages. Notion owns canonical personal records. Each application owns its source and runtime. The internal routing inventory belongs in the existing private LifeOS Home implementation checkpoint. Keep it out of this public repository, PR text, screenshots and builds.
 
+## Web Home is the primary launcher
+
+NAV-04 keeps the existing web app as the single primary interface. Notion remains authoritative for records and opens as a destination. The private Notion widget experiment is optional. Specialist apps retain their separate deployments.
+
+| Class | Meaning in Home |
+| --- | --- |
+| A | Approved launch address. The destination may still require sign-in. |
+| B | Candidate for explicit publication approval. The URL is absent from public source and builds. |
+| C | Restricted address or association. Deliver the route only after authorization. |
+| D | Destination missing or insufficiently verified. Show availability separately from route verification. |
+
+Private classification, exact addresses, and source evidence are maintained in the existing owner checkpoint. A page requiring sign-in can still disclose metadata through a link, including workspace branding before authentication.
+
 ## Public routing
 
 | Module | Application on public Home | Canonical access |
@@ -25,19 +38,21 @@ Compared the PR base `2681425`, original draft `31d9ead`, and revised draft. The
 | Health app | Direct desktop sidebar launch, owner sign-in | Removed | Same direct sidebar launch restored. Apps also exposes it on desktop and mobile with sign-in guidance. |
 | Wine app | Direct sidebar and Project tool launch | Retained and added to Apps | Retained. Both legacy Wine paths still preserve query and hash. |
 | Journey Tracker | Travel tracker tool opened the private Travel project | Direct public app in Apps and the Travel card | Direct public app retained in both places. The private project still needs manual discovery. |
-| Google Calendar | Direct in Upcoming and Quick actions | Retained | Both direct links retained. |
+| Google Calendar | Direct in Upcoming and Quick actions | Retained | Direct in Upcoming and Core LifeOS. The `#actions` bookmark remains valid. |
 | Project card context | Direct Wine Area, Game Shelf Project, Caribbean cruise Project and Fitness Project | All open generic Notion | Manual discovery remains for each. Game Shelf's former tool link also opened its Project. The tool shows that private hosting is pending. |
 | Surfaces | Direct Cookbook, Shopping Hub and Grocery shopping | All open generic Notion | Manual discovery remains for all three. |
 | Life domains | Direct Food, Home, Finance, Travel, Family, Health, Fitness, Personal planning, Music, Entertainment, Purchases & equipment, Wine production, Camping, Bicolline, Learning and Gaming | All open generic Notion | Manual discovery remains for all 16. Search and expand still work. The Health app and the private Health Area have separate routes. |
-| Notion quick actions | Direct Tasks, Notes & Memory and Reviews | All open generic Notion | Manual discovery remains. Each action names the record to find after opening Notion. |
-| Other Notion entry points | Today and sidebar opened Notion Home. Footer opened Life Command Center. Projects heading opened Projects. System overview opened Surface governance. | All open generic Notion | Manual discovery remains. The Workstreams directory explains how to find LifeOS Home. |
+| Core Notion records | Direct Tasks, Projects, Notes & Memory, Reviews, Cookbook, and Shopping Hub across Home | Generic Notion fallback | Core LifeOS lists each record with its access state. A separate generic Notion link supports manual discovery. |
+| Other Notion entry points | Today and sidebar opened Notion Home. Footer opened Life Command Center. Projects heading opened Projects. System overview opened Surface governance. | All open generic Notion | Manual discovery remains. The Workstreams directory describes the manual lookup. |
 | Home navigation and install | Section anchors, manifest, icons and standalone scope | Retained with new Apps and Workstreams anchors | Retained. Physical Safari and Home Screen verification is pending. |
 
 The earlier public edition included direct addresses for selected Notion records behind Notion access controls. The current classified inventory holds those routes for personal access. The revision restores the prior approval for Health's app address only. Health reports, canonical records and other restricted Site addresses stay in owner records.
 
 ### Gated decision
 
-Main LifeOS needs to either approve exact Notion addresses for public navigation, where disclosure of the address is acceptable, or approve an owner-authenticated directory for restricted routes. For a private directory, decide the audience and hosting, authenticate and authorize before returning any route, and verify that each approved Workstream opens in at most two interactions from the signed-in Home entry. Until then, the public directory supports discovery and the private navigation gap remains open.
+Approve category B addresses individually after reviewing metadata on signed-out access. Category C requires authenticated delivery in the same Home UI. Public GitHub Pages can keep serving the current shell and cannot deliver restricted data itself. Existing owner-private Sites confirm a managed access option. A separately authorized pilot could use the same Home source and UI on an owner-private origin if unauthenticated requests for HTML, assets and route payloads are all denied. A change of origin needs a Home Screen reinstall and return-path acceptance.
+
+If the current Pages origin must remain the installed entry, evaluate an owner-authenticated route endpoint consumed by Home. Validate identity and authorization server-side on every request, restrict browser origins, send private responses with `Cache-Control: no-store`, and keep restricted inventory outside the public repository and build. Verify login and return behavior in standalone Safari without assuming cross-site cookies. Keep route-only data and existing Notion permissions. No provider, session or hosting change is part of NAV-04.
 
 ## Change a route
 

@@ -976,7 +976,7 @@ main {
 .action-row:last-child {
   border-bottom: 0;
 }
-.action-row:hover h3 {
+a.action-row:hover h3 {
   color: #c2f0d6;
 }
 .action-row h3 {
@@ -1794,7 +1794,7 @@ footer > a:hover {
 }
 .directory-list li {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 10px;
   padding: 10px;
   background: var(--panel);
@@ -1802,19 +1802,24 @@ footer > a:hover {
   border-radius: var(--radius-control);
 }
 .directory-list h3 { font-size: 13px; }
-.directory-list p { font-size: 11px; color: #aab3b7; }
+.directory-list p { font-size: 12px; color: #aab3b7; }
 .directory-list .text-link { min-height: 44px; }
+.actions-section > .directory-notion { margin: 12px 0 0; }
 .tool-unavailable:hover { background: inherit; }
 
 @media (max-width: 980px) {
   .nav-item { min-height: 44px; }
 }
 @media (max-width: 700px) {
-  .mobile-nav-shortcuts { display: flex; gap: 8px; margin-bottom: 8px; }
+  .mobile-section-nav .mobile-nav-shortcuts {
+    display: grid; grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px; padding: 0; margin-bottom: 8px;
+  }
   .mobile-nav-shortcuts a {
     border: 1px solid var(--line);
     background: var(--panel);
     text-align: center;
-    flex: 1;
+    font-size: 12px;
+    padding: 12px 4px;
   }
 }

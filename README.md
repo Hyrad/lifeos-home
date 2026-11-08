@@ -1,6 +1,6 @@
 # LifeOS Home
 
-A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. The navigation edition opens approved applications and points users toward their existing private workspace.
+A responsive, dark-theme personal dashboard built with React, TypeScript, and Vite. The web app is the primary LifeOS launcher. Notion owns canonical records and specialist applications retain their own hosting.
 
 **Live site:** https://hyrad.github.io/lifeos-home/
 
@@ -11,8 +11,9 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 ## Included
 
 - **Apps** launches Wine Production, Journey Tracker and Health from Home in two interactions or fewer. Health requires its own owner sign-in.
-- **Workstreams** lists modules and canonical record roles. The generic Notion entry opens Notion sign-in or the existing session so the owner can open their private LifeOS Home.
-- Today, Projects, Upcoming, Surfaces, searchable Life domains, Quick actions and System overview retain their existing Home sections. Private links use the generic Notion entry point. Calendar and public app links still launch directly.
+- **Workstreams** separates canonical Notion records from app launches and shows publication, access, and availability states. The generic Notion entry is a manual lookup fallback.
+- **Core LifeOS** preserves direct Calendar access and lists the six canonical Notion destinations with their access states. Its anchor remains `#actions`.
+- Desktop and mobile give Apps, Workstreams, Projects, Core LifeOS, and Life domains their own section links. Today, Upcoming, Surfaces, domain search, and System overview remain available.
 - Keyboard navigation, focus indicators, a skip link, reduced-motion support, responsive layouts and a device-local date.
 
 See [navigation contract and rollout](docs/navigation-v1.md) for the public/private boundary, device acceptance, and specialist-app handoffs.

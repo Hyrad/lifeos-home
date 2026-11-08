@@ -1,7 +1,9 @@
 export type Tone = "mint" | "blue" | "lilac" | "amber" | "rose";
 export type PublicationRoute =
   | { visibility: "public-safe"; url: string }
-  | { visibility: "authenticated-only" | "internal" | "pending-review"; url?: never };
+  | { visibility: "authenticated-only" | "publication-review" | "pending-review"; url?: never };
+
+export type ApplicationRoute = PublicationRoute | { visibility: "approved-authenticated-launch"; url: string };
 
 export interface ModuleDefinition {
   id: string;
@@ -13,13 +15,15 @@ export interface ModuleDefinition {
   status: "active" | "planned" | "blocked" | "retired" | "unverified";
   canonical: {
     owner: "area" | "project" | "lifeos" | "unverified";
+    label?: string;
     role: "operator window" | "workstream" | "development surface" | "planner" | "project" | "area" | "reference" | "tracker" | "unverified";
     route: PublicationRoute;
   };
   application?: {
+    label?: string;
     status: "live" | "planned" | "blocked" | "unverified";
     installation: "standalone-manifest" | "browser-shortcut" | "unverified";
-    route: PublicationRoute | { visibility: "approved-authenticated-launch"; url: string };
+    route: ApplicationRoute;
   };
   placement: readonly ("apps" | "workstreams")[];
   related?: readonly string[];

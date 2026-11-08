@@ -21,7 +21,7 @@ describe("LifeOS navigation edition", () => {
       "Active-project links",
       "Find your flow",
       "Life domains",
-      "Quick actions",
+      "Core LifeOS",
       "System overview",
     ]) {
       expect(
@@ -47,6 +47,18 @@ describe("LifeOS navigation edition", () => {
       screen.queryByText(/all systems operational/i),
     ).not.toBeInTheDocument();
   });
+  it("offers direct Calendar and a clearly separate Notion fallback in Core LifeOS", () => {
+    render(<App />);
+    const core = within(screen.getByRole("region", { name: "Core LifeOS" }));
+    expect(core.getAllByRole("link")).toHaveLength(2);
+    expect(core.getByRole("link", { name: /^Calendar/ })).toHaveAttribute("href", sources.calendar);
+    expect(core.getByRole("link", { name: /^Open Notion to find records/ })).toHaveAttribute("href", sources.notion);
+    for (const name of ["Tasks", "Projects", "Notes & Memory", "Reviews", "Cookbook", "Shopping Hub"]) {
+      expect(core.getByRole("heading", { name })).toBeVisible();
+      expect(core.queryByRole("link", { name: new RegExp(name) })).not.toBeInTheDocument();
+    }
+  });
+
   it("searches collapsed domains and clears an empty result", async () => {
     const user = userEvent.setup();
     render(<App />);

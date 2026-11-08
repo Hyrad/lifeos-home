@@ -8,7 +8,7 @@ import {
   Gamepad2,
   Heart,
   Home,
-  Lightbulb,
+  Layers3,
   ListChecks,
   Music2,
   Plane,
@@ -22,7 +22,8 @@ import {
   ShoppingCart,
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
-import { journeyPageURL, notionLauncherURL, winePageURL } from "./modules";
+import type { PublicationRoute } from "../types/module";
+import { journeyPageURL, notionLauncherURL, privateRecord, publicationReview, winePageURL } from "./modules";
 
 export const sources = {
   notion: notionLauncherURL,
@@ -237,33 +238,12 @@ export const domains: Destination[] = [
   },
 ];
 
-export const quickActions: Destination[] = [
-  {
-    title: "Add a task",
-    description: "Find Tasks in your Notion workspace",
-    href: sources.notion,
-    icon: ListChecks,
-    tone: "mint",
-  },
-  {
-    title: "Capture a thought",
-    description: "Find Notes & Memory in your Notion workspace",
-    href: sources.notion,
-    icon: Lightbulb,
-    tone: "amber",
-  },
-  {
-    title: "Plan your time",
-    description: "Open Google Calendar",
-    href: sources.calendar,
-    icon: CalendarDays,
-    tone: "blue",
-  },
-  {
-    title: "Take a step back",
-    description: "Find Reviews in your Notion workspace",
-    href: sources.notion,
-    icon: BookOpen,
-    tone: "lilac",
-  },
+export const coreDestinations: (Pick<Destination, "title" | "icon" | "tone"> & { route: PublicationRoute })[] = [
+  { title: "Calendar", icon: CalendarDays, tone: "blue", route: { visibility: "public-safe", url: sources.calendar } },
+  { title: "Tasks", icon: ListChecks, tone: "mint", route: privateRecord },
+  { title: "Projects", icon: Layers3, tone: "lilac", route: privateRecord },
+  { title: "Notes & Memory", icon: BookMarked, tone: "amber", route: privateRecord },
+  { title: "Reviews", icon: BookOpen, tone: "lilac", route: privateRecord },
+  { title: "Cookbook", icon: Soup, tone: "amber", route: publicationReview },
+  { title: "Shopping Hub", icon: ShoppingBag, tone: "blue", route: publicationReview },
 ];

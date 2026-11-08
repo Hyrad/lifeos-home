@@ -54,6 +54,16 @@ describe("public navigation manifest", () => {
     expect(JSON.stringify(navigationManifest).replaceAll(allowed[2], "")).not.toMatch(/notion\.(?:so|com)\/p\/|chatgpt\.site|[a-f\d]{32}/i);
   });
 
+  it("distinguishes publication review, authenticated delivery, and unknown launch routes", () => {
+    const routes = Object.fromEntries(modules.map(module => [module.id, module]));
+    expect(routes.music.canonical.route).toEqual({ visibility: "publication-review" });
+    expect(routes.music.application).toMatchObject({ status: "live", route: { visibility: "authenticated-only" } });
+    expect(routes["family-technology"].canonical.route).toEqual({ visibility: "authenticated-only" });
+    expect(routes["family-technology"].application).toMatchObject({ status: "unverified", route: { visibility: "pending-review" } });
+    expect(routes["game-shelf"].application).toMatchObject({ status: "blocked", route: { visibility: "pending-review" } });
+    expect(routes.founder.application).toMatchObject({ status: "live", route: { visibility: "pending-review" } });
+  });
+
   it("keeps a generic fallback for restricted and absent launch routes", () => {
     const music = modules.find(module => module.id === "music")!;
     const cooking = modules.find(module => module.id === "cooking")!;

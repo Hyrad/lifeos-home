@@ -77,11 +77,11 @@ try {
     const directoryNav = width <= 700
       ? page.locator(".mobile-nav-shortcuts")
       : page.getByRole("navigation", { name: "Main navigation" });
-    for (const section of ["Apps", "Workstreams"]) {
+    for (const [section, anchor] of [["Apps", "apps"], ["Workstreams", "workstreams"], ["Projects", "projects"], ["Core LifeOS", "actions"], ["Life domains", "domains"]]) {
       const link = directoryNav.getByRole("link", { name: section, exact: true });
       assert.ok((await link.boundingBox()).height >= 44, `${name}: ${section} touch target`);
       await link.click();
-      assert.equal(new URL(page.url()).hash, `#${section.toLowerCase()}`);
+      assert.equal(new URL(page.url()).hash, `#${anchor}`);
       assert.equal(await link.getAttribute("aria-current"), "location");
     }
     const apps = page.getByRole("region", { name: "Apps" });
@@ -99,7 +99,7 @@ try {
     }
     for (const calendar of [
       page.locator("#upcoming").getByRole("link", { name: /^Open Google Calendar/ }),
-      page.locator("#actions").getByRole("link", { name: /^Plan your time/ }),
+      page.locator("#actions").getByRole("link", { name: /^Calendar/ }),
     ]) {
       assert.equal(await calendar.getAttribute("href"), calendarURL);
       assert.equal(await calendar.getAttribute("target"), "_blank");
@@ -110,7 +110,12 @@ try {
     assert.equal(await privateFallback.getAttribute("href"), notionURL);
     assert.equal(await privateFallback.getAttribute("rel"), "noopener noreferrer");
     assert.ok((await privateFallback.boundingBox()).height >= 44, `${name}: Notion touch target`);
-    assert.equal(await workstreams.getByRole("link").count(), 1);
+    assert.deepEqual(await workstreams.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
+      [notionURL, wineURL, journeyURL, healthURL]);
+    const core = page.getByRole("region", { name: "Core LifeOS" });
+    assert.deepEqual(await core.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
+      [calendarURL, notionURL]);
+    assert.equal(await core.locator(".core-record").count(), 6);
     assert.equal(await workstreams.getByRole("listitem").count(), 13);
     const manifestURL = await page.locator('link[rel="manifest"]').getAttribute("href");
     const appManifest = await page.evaluate(async href => {
@@ -266,6 +271,19 @@ try {
     [],
     "Unexpected third-party or private API requests",
   );
+  const launchPage = await context.newPage();
+  await launchPage.setViewportSize({ width: 390, height: 844 });
+  for (const [label, href] of [["Journey Tracker", journeyURL], ["Health", healthURL]]) {
+    const expected = new URL(href).href;
+    await launchPage.route(expected, route => route.fulfill({ status: 200, body: "Launch probe" }), { times: 1 });
+    await launchPage.goto(url);
+    await launchPage.getByRole("navigation", { name: "Primary sections" }).getByRole("link", { name: "Apps" }).click();
+    await launchPage.getByRole("region", { name: "Apps" }).getByRole("link", { name: new RegExp(`^Open ${label}`) }).click();
+    await launchPage.waitForURL(expected);
+    assert.equal(await launchPage.locator("body").innerText(), "Launch probe");
+  }
+  await launchPage.close();
+  console.log("Journey Tracker and Health launch URLs passed with intercepted destination responses.");
   console.log(
     "Keyboard checks passed. No browser errors, failed requests, or external requests.",
   );

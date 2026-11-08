@@ -10,6 +10,7 @@ it.each([
   ["Notion record", "https://app.notion.com/p/0123456789abcdef0123456789abcdef", /Unexpected URL/],
   ["bare private ID", "0123456789abcdef0123456789abcdef", /Private reference pattern/],
   ["unapproved Sites host", "https://synthetic-private.chatgpt.site", /Unexpected URL/],
+  ["synthetic credential", "sb_secret_boundary_fixture", /Credential pattern/],
   ["Health deep link", "https://hyrad-lifeos-health.newpeach71.chatgpt.site/private", /Unexpected URL/],
 ])("rejects a %s in a production asset", (_label, value, message) => {
   const root = mkdtempSync(join(tmpdir(), "lifeos-boundary-"));

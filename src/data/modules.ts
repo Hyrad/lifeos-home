@@ -1,4 +1,4 @@
-import type { ModuleDefinition } from "../types/module";
+import type { ApplicationRoute, ModuleDefinition } from "../types/module";
 
 export const winePageURL = "https://hyrad.github.io/lifeos-wine-production/";
 export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
@@ -6,7 +6,19 @@ export const healthAppURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site
 export const notionLauncherURL = "https://app.notion.com/login";
 
 const reviewedOn = "2026-11-08";
-const privateRecord = { visibility: "authenticated-only" } as const;
+export const privateRecord = { visibility: "authenticated-only" } as const;
+export const publicationReview = { visibility: "publication-review" } as const;
+const unverifiedRoute = { visibility: "pending-review" } as const;
+
+export function routeAccessLabel(route: ApplicationRoute) {
+  return {
+    "public-safe": "Direct link available",
+    "approved-authenticated-launch": "Sign-in required",
+    "publication-review": "Direct link needs publication approval",
+    "authenticated-only": "Private link requires authenticated delivery",
+    "pending-review": "Destination unverified",
+  }[route.visibility];
+}
 const privateApp = {
   status: "live",
   installation: "unverified",
@@ -25,7 +37,7 @@ export const navigationManifest = {
   modules: [
     {
       ...directoryEntry,
-      id: "lifeos", label: "LifeOS Home", description: "Shared navigation and governance.",
+      id: "lifeos", label: "LifeOS planning & governance", description: "Shared navigation and governance.",
       domain: "LifeOS", icon: "compass", tone: "mint", status: "active",
       canonical: { owner: "lifeos", role: "operator window", route: privateRecord },
       evidence: "LifeOS Home and shared module directory",
@@ -34,7 +46,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "wine", label: "Wine Production", description: "Winemaking guides and workspace.",
       domain: "Food & drink", icon: "wine", tone: "rose", status: "active",
-      canonical: { owner: "area", role: "operator window", route: privateRecord },
+      canonical: { owner: "area", role: "area", route: publicationReview },
       application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: winePageURL } },
       placement: ["apps", "workstreams"],
       evidence: "LifeOS Home and live GitHub Pages site and manifest",
@@ -43,7 +55,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "travel", label: "Journey Tracker", description: "Explore the published travel tracker.",
       domain: "Travel", icon: "travel", tone: "blue", status: "active",
-      canonical: { owner: "area", role: "planner", route: privateRecord },
+      canonical: { owner: "area", role: "area", label: "Travel", route: publicationReview },
       application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: journeyPageURL } },
       placement: ["apps", "workstreams"],
       evidence: "Travel owner and public tracker release, live site and manifest",
@@ -52,7 +64,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "health", label: "Health", description: "Personal wellbeing.",
       domain: "Wellbeing", icon: "health", tone: "mint", status: "active",
-      canonical: { owner: "area", role: "area", route: privateRecord },
+      canonical: { owner: "area", role: "area", label: "Health & Medical", route: privateRecord },
       application: { ...privateApp, route: { visibility: "approved-authenticated-launch", url: healthAppURL } },
       placement: ["apps", "workstreams"], related: ["fitness"],
       evidence: "Health owner and approved Home v0.2.1 app launch",
@@ -69,7 +81,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "music", label: "Music", description: "Creative development and practice.",
       domain: "Creative", icon: "music", tone: "amber", status: "active",
-      canonical: { owner: "project", role: "workstream", route: privateRecord },
+      canonical: { owner: "project", role: "workstream", label: "Music Creative Dashboard", route: publicationReview },
       application: privateApp,
       evidence: "Music owner and Creative Dashboard",
     },
@@ -77,8 +89,8 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "game-shelf", label: "Game Shelf", description: "Personal game library.",
       domain: "Games", icon: "game", tone: "lilac", status: "active",
-      canonical: { owner: "project", role: "development surface", route: privateRecord },
-      application: { status: "blocked", installation: "unverified", route: { visibility: "pending-review" } },
+      canonical: { owner: "project", role: "development surface", label: "Game Shelf Development", route: publicationReview },
+      application: { status: "blocked", installation: "unverified", route: unverifiedRoute },
       evidence: "Game Shelf owner and development surface",
     },
     {
@@ -86,7 +98,7 @@ export const navigationManifest = {
       id: "family-technology", label: "Family technology", description: "Family technology projects.",
       domain: "Home", icon: "family", tone: "rose", status: "active",
       canonical: { owner: "project", role: "workstream", route: privateRecord },
-      application: { status: "unverified", installation: "unverified", route: { visibility: "pending-review" } },
+      application: { status: "unverified", installation: "unverified", route: unverifiedRoute },
       evidence: "Shared module directory",
     },
     {
@@ -100,28 +112,28 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "cooking", label: "Cooking", description: "Recipe and cooking references.",
       domain: "Food & drink", icon: "food", tone: "amber", status: "active",
-      canonical: { owner: "area", role: "reference", route: privateRecord },
+      canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: publicationReview },
       related: ["shopping"], evidence: "Cuisine owner and Cookbook",
     },
     {
       ...directoryEntry,
       id: "shopping", label: "Shopping", description: "Shopping surfaces.",
       domain: "Home", icon: "shopping", tone: "blue", status: "active",
-      canonical: { owner: "area", role: "tracker", route: privateRecord },
+      canonical: { owner: "area", role: "tracker", label: "Shopping Hub", route: publicationReview },
       related: ["cooking"], evidence: "LifeOS Home and Shopping Hub",
     },
     {
       ...directoryEntry,
       id: "casino-academy", label: "CasinoAcademy", description: "Casino game education project.",
       domain: "Games", icon: "development", tone: "lilac", status: "planned",
-      canonical: { owner: "project", role: "workstream", route: privateRecord },
-      application: privateApp, evidence: "CasinoAcademy owner and development workstream",
+      canonical: { owner: "project", role: "workstream", label: "CasinoAcademy Development", route: publicationReview },
+      application: { ...privateApp, label: "Development Command Center" }, evidence: "CasinoAcademy owner and development workstream",
     },
     {
       id: "founder", label: "Founder workspace", description: "Personal founder workspace.",
       domain: "Personal", icon: "development", tone: "blue", status: "unverified",
-      canonical: { owner: "unverified", role: "unverified", route: { visibility: "internal" } },
-      application: { status: "unverified", installation: "unverified", route: { visibility: "pending-review" } },
+      canonical: { owner: "unverified", role: "unverified", route: unverifiedRoute },
+      application: { ...privateApp, route: unverifiedRoute },
       placement: ["workstreams"], evidence: "Shared module directory and mission handoff", verifiedOn: reviewedOn,
     },
   ],
@@ -140,6 +152,7 @@ export function publicLaunchURL(module: ModuleDefinition) {
 export const homeSections = [
   { id: "today", label: "Overview" }, { id: "apps", label: "Apps" },
   { id: "workstreams", label: "Workstreams" }, { id: "projects", label: "Projects" },
-  { id: "surfaces", label: "Surfaces" }, { id: "domains", label: "Life domains" },
+  { id: "actions", label: "Core LifeOS" }, { id: "domains", label: "Life domains" },
+  { id: "surfaces", label: "Surfaces" },
   { id: "system", label: "System overview" },
 ] as const;

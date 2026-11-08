@@ -81,7 +81,7 @@ export function SectionHeading({
 
 const sectionIcons = {
   today: House, apps: AppWindow, workstreams: Workflow,
-  projects: Layers3, surfaces: Grid2X2, domains: Compass, system: ShieldCheck,
+  projects: Layers3, actions: Grid2X2, surfaces: Grid2X2, domains: Compass, system: ShieldCheck,
 };
 export function Sidebar({
   active,

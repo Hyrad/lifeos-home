@@ -19,10 +19,11 @@ import {
 import {
   domains,
   projects,
-  quickActions,
+  coreDestinations,
   sources,
   surfaces,
 } from "./data/navigation";
+import { routeAccessLabel } from "./data/modules";
 import { NavigationDirectory } from "./components/NavigationDirectory";
 import { ProjectCard } from "./components/ProjectCard";
 import { AppShell } from "./components/AppShell";
@@ -321,32 +322,36 @@ export default function App() {
             >
               <SectionHeading
                 id="actions-title"
-                title="Quick actions"
-                subtitle="Catch a thought. Take the next step."
+                title="Core LifeOS"
+                subtitle="Calendar opens directly. Notion records show their access status."
               />
               <div className="action-list">
-                {quickActions.map((item) => (
-                  <External
-                    href={item.href}
-                    key={item.title}
-                    className="action-row"
-                  >
-                    <IconBox icon={item.icon} tone={item.tone} small />
-                    <div>
-                      <h3>{item.title}</h3>
-                      <p>{item.description}</p>
-                    </div>
-                    <ArrowUpRight
-                      size={15}
-                      className="outbound"
-                      aria-hidden="true"
-                    />
-                  </External>
-                ))}
+                {coreDestinations.map(({ title, icon, tone, route }) => {
+                  const content = (
+                    <>
+                      <IconBox icon={icon} tone={tone} small />
+                      <div>
+                        <h3>{title}</h3>
+                        <p>{route.visibility === "public-safe" ? "Open Google Calendar" : routeAccessLabel(route)}</p>
+                      </div>
+                    </>
+                  );
+                  return route.visibility === "public-safe" ? (
+                    <External href={route.url} key={title} className="action-row">
+                      {content}
+                      <ArrowUpRight size={15} className="outbound" aria-hidden="true" />
+                    </External>
+                  ) : (
+                    <div key={title} className="action-row core-record">{content}</div>
+                  );
+                })}
               </div>
+              <External href={sources.notion} className="button directory-notion">
+                Open Notion to find records <ArrowUpRight size={16} aria-hidden="true" />
+              </External>
               <p className="small-note action-note">
                 <ExternalLink size={12} aria-hidden="true" />
-                Notion opens your session or sign-in. Find the named record in your workspace.
+                After opening Notion, find the record in your workspace.
               </p>
             </section>
           </div>
@@ -376,7 +381,7 @@ export default function App() {
                     Navigation{" "}
                     <span className="status-pill available">Available</span>
                   </h3>
-                  <p>Curated links to existing personal destinations.</p>
+                  <p>Approved apps open directly. Private records show their access status.</p>
                 </div>
               </div>
               <div className="system-item">

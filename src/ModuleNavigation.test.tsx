@@ -42,9 +42,15 @@ describe("Independent module navigation", () => {
     expect(apps.getByRole("link", { name: /^Open Journey Tracker/ })).toHaveAttribute("href", journeyPageURL);
     expect(apps.getAllByRole("link")).toHaveLength(3);
     const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
-    expect(workstreams.getByRole("heading", { name: "Music" })).toBeVisible();
-    expect(workstreams.getByRole("heading", { name: "Game Shelf" })).toBeVisible();
-    expect(workstreams.getAllByRole("link")).toHaveLength(1);
+    expect(workstreams.getByRole("heading", { name: "Music Creative Dashboard" })).toBeVisible();
+    expect(workstreams.getByRole("heading", { name: "Game Shelf Development" })).toBeVisible();
+    expect(workstreams.getAllByRole("link").map(link => link.getAttribute("href"))).toEqual([
+      notionLauncherURL, winePageURL, journeyPageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
+    ]);
+    expect(workstreams.getAllByText(/Live app · Private link requires authenticated delivery/)).toHaveLength(2);
+    expect(workstreams.getByText(/App blocked · Destination unverified/)).toBeVisible();
+    expect(workstreams.getByText(/App availability unverified · Destination unverified/)).toBeVisible();
+    expect(workstreams.getAllByText(/Direct link needs publication approval/)).not.toHaveLength(0);
     expect(workstreams.getByRole("link", { name: /Open Notion/ })).toHaveAttribute("href", notionLauncherURL);
   });
 
