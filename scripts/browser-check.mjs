@@ -11,6 +11,12 @@ const { version } = JSON.parse(
 const journeyURL = "https://hyrad.github.io/journey-tracker/";
 const healthURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
 const calendarURL = "https://calendar.google.com/";
+const notionRecords = [
+  ["Workstreams", "Open Wine Making Area", "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad"],
+  ["Workstreams", "Open Travel Area", "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36"],
+  ["Find your flow", "Open Cookbook", "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922"],
+  ["Find your flow", "Open Shopping Hub", "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095"],
+];
 const notionURL = "https://app.notion.com/login";
 const wineURL = "https://hyrad.github.io/lifeos-wine-production/";
 const allowedOrigins = new Set([new URL(url).origin, new URL(wineURL).origin]);
@@ -111,12 +117,19 @@ try {
     assert.equal(await privateFallback.getAttribute("rel"), "noopener noreferrer");
     assert.ok((await privateFallback.boundingBox()).height >= 44, `${name}: Notion touch target`);
     assert.deepEqual(await workstreams.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
-      [notionURL, wineURL, journeyURL, healthURL]);
+      [notionURL, notionRecords[0][2], wineURL, notionRecords[1][2], journeyURL, healthURL]);
     const core = page.getByRole("region", { name: "Core LifeOS" });
     assert.deepEqual(await core.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
       [calendarURL, notionURL]);
     assert.equal(await core.locator(".core-record").count(), 6);
     assert.equal(await workstreams.getByRole("listitem").count(), 13);
+    for (const [section, label, href] of notionRecords) {
+      const link = page.getByRole("region", { name: section }).getByRole("link", { name: new RegExp(`^${label}`) });
+      assert.equal(await link.getAttribute("href"), href);
+      assert.equal(await link.getAttribute("target"), "_blank");
+      assert.equal(await link.getAttribute("rel"), "noopener noreferrer");
+      assert.ok((await link.boundingBox()).height >= 44, `${name}: ${label} touch target`);
+    }
     const manifestURL = await page.locator('link[rel="manifest"]').getAttribute("href");
     const appManifest = await page.evaluate(async href => {
       const response = await fetch(href);
@@ -282,6 +295,16 @@ try {
     await launchPage.waitForURL(expected);
     assert.equal(await launchPage.locator("body").innerText(), "Launch probe");
   }
+  await launchPage.goto(url);
+  for (const [section, label, href] of notionRecords) {
+    await context.route(href, route => route.fulfill({ status: 200, body: "Notion navigation probe" }), { times: 1 });
+    const link = launchPage.getByRole("region", { name: section }).getByRole("link", { name: new RegExp(`^${label}`) });
+    const [popup] = await Promise.all([launchPage.waitForEvent("popup"), link.click()]);
+    await popup.waitForURL(href);
+    assert.equal(await popup.locator("body").innerText(), "Notion navigation probe");
+    await popup.close();
+  }
+  console.log("Four exact Notion outbound navigations passed with intercepted destination responses.");
   await launchPage.close();
   console.log("Journey Tracker and Health launch URLs passed with intercepted destination responses.");
   console.log(

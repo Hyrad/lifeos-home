@@ -59,7 +59,11 @@ export function NavigationDirectory() {
                 <div>
                   <h3>{canonical.label ?? module.label}</h3>
                   {canonical.route.visibility === "public-safe" ? (
-                    <External href={canonical.route.url} className="text-link">Open Notion {canonical.role}</External>
+                    canonical.linkSection === "surfaces" ? (
+                      <p>Direct Notion link in Surfaces</p>
+                    ) : (
+                      <External href={canonical.route.url} className="text-link">Open {canonical.label ?? module.label}</External>
+                    )
                   ) : (
                     <p>{canonical.role === "unverified"
                       ? "Canonical record unverified"

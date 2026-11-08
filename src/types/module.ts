@@ -18,6 +18,7 @@ export interface ModuleDefinition {
     label?: string;
     role: "operator window" | "workstream" | "development surface" | "planner" | "project" | "area" | "reference" | "tracker" | "unverified";
     route: PublicationRoute;
+    linkSection?: "surfaces";
   };
   application?: {
     label?: string;

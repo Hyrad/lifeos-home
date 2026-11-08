@@ -5,6 +5,14 @@ export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
 export const healthAppURL = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
 export const notionLauncherURL = "https://app.notion.com/login";
 
+// NAV-05 explicitly approved disclosure of these four exact addresses.
+export const approvedNotionRoutes = {
+  wine: { visibility: "public-safe", url: "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad" },
+  travel: { visibility: "public-safe", url: "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36" },
+  cookbook: { visibility: "public-safe", url: "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922" },
+  shopping: { visibility: "public-safe", url: "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095" },
+} as const;
+
 const reviewedOn = "2026-11-08";
 export const privateRecord = { visibility: "authenticated-only" } as const;
 export const publicationReview = { visibility: "publication-review" } as const;
@@ -46,7 +54,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "wine", label: "Wine Production", description: "Winemaking guides and workspace.",
       domain: "Food & drink", icon: "wine", tone: "rose", status: "active",
-      canonical: { owner: "area", role: "area", route: publicationReview },
+      canonical: { owner: "area", role: "area", label: "Wine Making Area", route: approvedNotionRoutes.wine },
       application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: winePageURL } },
       placement: ["apps", "workstreams"],
       evidence: "LifeOS Home and live GitHub Pages site and manifest",
@@ -55,7 +63,7 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "travel", label: "Journey Tracker", description: "Explore the published travel tracker.",
       domain: "Travel", icon: "travel", tone: "blue", status: "active",
-      canonical: { owner: "area", role: "area", label: "Travel", route: publicationReview },
+      canonical: { owner: "area", role: "area", label: "Travel Area", route: approvedNotionRoutes.travel },
       application: { status: "live", installation: "standalone-manifest", route: { visibility: "public-safe", url: journeyPageURL } },
       placement: ["apps", "workstreams"],
       evidence: "Travel owner and public tracker release, live site and manifest",
@@ -112,14 +120,14 @@ export const navigationManifest = {
       ...directoryEntry,
       id: "cooking", label: "Cooking", description: "Recipe and cooking references.",
       domain: "Food & drink", icon: "food", tone: "amber", status: "active",
-      canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: publicationReview },
+      canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: approvedNotionRoutes.cookbook, linkSection: "surfaces" },
       related: ["shopping"], evidence: "Cuisine owner and Cookbook",
     },
     {
       ...directoryEntry,
       id: "shopping", label: "Shopping", description: "Shopping surfaces.",
       domain: "Home", icon: "shopping", tone: "blue", status: "active",
-      canonical: { owner: "area", role: "tracker", label: "Shopping Hub", route: publicationReview },
+      canonical: { owner: "area", role: "tracker", label: "Shopping Hub", route: approvedNotionRoutes.shopping, linkSection: "surfaces" },
       related: ["cooking"], evidence: "LifeOS Home and Shopping Hub",
     },
     {

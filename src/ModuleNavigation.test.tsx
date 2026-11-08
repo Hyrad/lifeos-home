@@ -45,8 +45,11 @@ describe("Independent module navigation", () => {
     expect(workstreams.getByRole("heading", { name: "Music Creative Dashboard" })).toBeVisible();
     expect(workstreams.getByRole("heading", { name: "Game Shelf Development" })).toBeVisible();
     expect(workstreams.getAllByRole("link").map(link => link.getAttribute("href"))).toEqual([
-      notionLauncherURL, winePageURL, journeyPageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
+      notionLauncherURL, "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad", winePageURL,
+      "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36", journeyPageURL, "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
     ]);
+    expect(workstreams.getByRole("link", { name: /^Open Wine Making Area/ })).toHaveAttribute("href", "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad");
+    expect(workstreams.getByRole("link", { name: /^Open Travel Area/ })).toHaveAttribute("href", "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36");
     expect(workstreams.getAllByText(/Live app · Private link requires authenticated delivery/)).toHaveLength(2);
     expect(workstreams.getByText(/App blocked · Destination unverified/)).toBeVisible();
     expect(workstreams.getByText(/App availability unverified · Destination unverified/)).toBeVisible();
@@ -76,8 +79,8 @@ describe("Independent module navigation", () => {
     });
     expect(within(wine).getByText("Life domain")).toBeVisible();
     expect(
-      within(wine).getByRole("link", { name: /Find in Notion/ }),
-    ).not.toHaveAttribute("href", winePageURL);
+      within(wine).getByRole("link", { name: /Open Wine Making Area/ }),
+    ).toHaveAttribute("href", "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad");
     expect(within(wine).getByText("Web workspace")).toBeVisible();
 
     const fitness = screen.getByRole("article", { name: "Fitness workspace" });

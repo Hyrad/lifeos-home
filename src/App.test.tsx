@@ -59,6 +59,19 @@ describe("LifeOS navigation edition", () => {
     }
   });
 
+  it("opens Cookbook and Shopping Hub directly from Surfaces once each", () => {
+    render(<App />);
+    const surfaces = within(screen.getByRole("region", { name: "Find your flow" }));
+    for (const [name, url] of [
+      ["Open Cookbook", "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922"],
+      ["Open Shopping Hub", "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095"],
+    ]) {
+      expect(surfaces.getByRole("link", { name: new RegExp(name) })).toHaveAttribute("href", url);
+      expect(document.querySelectorAll(`a[href="${url}"]`)).toHaveLength(1);
+    }
+    expect(surfaces.getByRole("link", { name: /Find Grocery shopping in Notion/ })).toHaveAttribute("href", sources.notion);
+  });
+
   it("searches collapsed domains and clears an empty result", async () => {
     const user = userEvent.setup();
     render(<App />);
@@ -110,6 +123,10 @@ describe("LifeOS navigation edition", () => {
     const newTab = new Set([
       "https://app.notion.com/login",
       "https://calendar.google.com/",
+      "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad",
+      "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36",
+      "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922",
+      "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095",
     ]);
     for (const link of screen.getAllByRole("link")) {
       const href = link.getAttribute("href")!;

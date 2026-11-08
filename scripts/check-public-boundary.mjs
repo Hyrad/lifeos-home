@@ -3,7 +3,16 @@ import assert from "node:assert/strict";
 
 // Home v0.2.1 approved this exact address. The app still enforces owner access.
 const approvedHealthLaunch = "https://hyrad-lifeos-health.newpeach71.chatgpt.site";
+// NAV-05 approves these exact URLs, without query strings or fragments.
+const approvedNotion = new Set([
+  "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad",
+  "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36",
+  "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922",
+  "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095",
+]);
+const foundNotion = new Set();
 const approved = new Set([
+  ...approvedNotion,
   "https://app.notion.com/login",
   "https://calendar.google.com/",
   "https://hyrad.github.io/lifeos-wine-production/",
@@ -26,6 +35,10 @@ async function scan(path) {
   const remaining = text.replace(/https?:\/\/[^\s"'<>\x60\\)]+/g, (url) => {
     // Bundled framework code includes React errors and standard XML/SVG namespaces.
     assert.ok(approved.has(url) || standardURLs.has(url), `Unexpected URL in ${path}`);
+    if (approvedNotion.has(url)) {
+      foundNotion.add(url);
+      return "";
+    }
     return url === approvedHealthLaunch ? "" : url;
   });
   assert.ok(!privateReferences.test(remaining), `Private reference pattern in ${path}`);
@@ -55,4 +68,5 @@ for (const icon of manifest.icons) {
   const bytes = await readFile(`dist/${icon.src}`);
   assert.equal(bytes.subarray(1, 4).toString(), "PNG");
 }
+assert.deepEqual(foundNotion, approvedNotion, "Expected all four approved Notion routes in the build");
 console.log("Public artifact checks passed; manual content review remains required.");

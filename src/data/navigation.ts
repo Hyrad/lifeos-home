@@ -23,7 +23,7 @@ import {
 } from "lucide-react";
 import type { LucideIcon } from "lucide-react";
 import type { PublicationRoute } from "../types/module";
-import { journeyPageURL, notionLauncherURL, privateRecord, publicationReview, winePageURL } from "./modules";
+import { approvedNotionRoutes, journeyPageURL, notionLauncherURL, privateRecord, winePageURL } from "./modules";
 
 export const sources = {
   notion: notionLauncherURL,
@@ -34,6 +34,7 @@ export interface Destination {
   title: string;
   description: string;
   href: string;
+  actionLabel?: string;
   icon: LucideIcon;
   tone: "mint" | "blue" | "lilac" | "amber" | "rose";
 }
@@ -56,7 +57,8 @@ export const projects: ProjectDestination[] = [
   {
     title: "Wine Production",
     description: "Your personal winemaking workspace.",
-    href: sources.notion,
+    href: approvedNotionRoutes.wine.url,
+    actionLabel: "Open Wine Making Area",
     icon: Wine,
     tone: "rose",
     workspaceKind: "Life domain",
@@ -97,7 +99,8 @@ export const surfaces = [
   {
     title: "Cookbook",
     description: "Find something good to cook.",
-    href: sources.notion,
+    href: approvedNotionRoutes.cookbook.url,
+    actionLabel: "Open Cookbook",
     icon: Soup,
     tone: "amber",
     type: "Reference role",
@@ -106,7 +109,8 @@ export const surfaces = [
   {
     title: "Shopping Hub",
     description: "Start your next shopping run.",
-    href: sources.notion,
+    href: approvedNotionRoutes.shopping.url,
+    actionLabel: "Open Shopping Hub",
     icon: ShoppingBag,
     tone: "lilac",
     type: "Tracker",
@@ -148,7 +152,8 @@ export const domains: Destination[] = [
   {
     title: "Travel",
     description: "Plans & experiences",
-    href: sources.notion,
+    href: approvedNotionRoutes.travel.url,
+    actionLabel: "Open Travel Area",
     icon: Plane,
     tone: "blue",
   },
@@ -204,7 +209,8 @@ export const domains: Destination[] = [
   {
     title: "Wine production",
     description: "Personal winemaking",
-    href: sources.notion,
+    href: approvedNotionRoutes.wine.url,
+    actionLabel: "Open Wine Making Area",
     icon: Wine,
     tone: "rose",
   },
@@ -238,12 +244,12 @@ export const domains: Destination[] = [
   },
 ];
 
-export const coreDestinations: (Pick<Destination, "title" | "icon" | "tone"> & { route: PublicationRoute })[] = [
+export const coreDestinations: (Pick<Destination, "title" | "icon" | "tone"> & { route: PublicationRoute; linkSection?: "surfaces" })[] = [
   { title: "Calendar", icon: CalendarDays, tone: "blue", route: { visibility: "public-safe", url: sources.calendar } },
   { title: "Tasks", icon: ListChecks, tone: "mint", route: privateRecord },
   { title: "Projects", icon: Layers3, tone: "lilac", route: privateRecord },
   { title: "Notes & Memory", icon: BookMarked, tone: "amber", route: privateRecord },
   { title: "Reviews", icon: BookOpen, tone: "lilac", route: privateRecord },
-  { title: "Cookbook", icon: Soup, tone: "amber", route: publicationReview },
-  { title: "Shopping Hub", icon: ShoppingBag, tone: "blue", route: publicationReview },
+  { title: "Cookbook", icon: Soup, tone: "amber", route: approvedNotionRoutes.cookbook, linkSection: "surfaces" },
+  { title: "Shopping Hub", icon: ShoppingBag, tone: "blue", route: approvedNotionRoutes.shopping, linkSection: "surfaces" },
 ];

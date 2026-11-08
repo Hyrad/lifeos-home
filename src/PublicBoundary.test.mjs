@@ -6,8 +6,14 @@ import { expect, it } from "vitest";
 
 const scanner = resolve("scripts/check-public-boundary.mjs");
 
+const approvedWine = "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad";
+
 it.each([
   ["Notion record", "https://app.notion.com/p/0123456789abcdef0123456789abcdef", /Unexpected URL/],
+  ["approved Notion URL with query", approvedWine + "?v=synthetic", /Unexpected URL/],
+  ["approved Notion URL with fragment", approvedWine + "#synthetic", /Unexpected URL/],
+  ["approved Notion URL with a trailing slash", approvedWine + "/", /Unexpected URL/],
+  ["bare approved page ID", approvedWine.split("/").at(-1), /Private reference pattern/],
   ["bare private ID", "0123456789abcdef0123456789abcdef", /Private reference pattern/],
   ["unapproved Sites host", "https://synthetic-private.chatgpt.site", /Unexpected URL/],
   ["synthetic credential", "sb_secret_boundary_fixture", /Credential pattern/],

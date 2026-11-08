@@ -22,18 +22,29 @@ describe("public navigation manifest", () => {
     }
   });
 
-  it("exposes only approved app launch URLs and keeps canonical records private", () => {
+  it("exposes only the approved application and canonical URLs", () => {
     const allowed = [
       "https://hyrad.github.io/lifeos-wine-production/",
       "https://hyrad.github.io/journey-tracker/",
       "https://hyrad-lifeos-health.newpeach71.chatgpt.site",
     ];
+    const canonicalRoutes = new Map([
+      ["wine", "https://app.notion.com/p/472be780ce1a8247b9ed8166a00fb5ad"],
+      ["travel", "https://app.notion.com/p/da5be780ce1a8235816401a81385ef36"],
+      ["cooking", "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922"],
+      ["shopping", "https://app.notion.com/p/3f7be780ce1a81a999acce540ad4d095"],
+    ]);
     const launches = [];
     for (const module of modules) {
       const launch = publicLaunchURL(module);
       expect(module.placement.includes("apps")).toBe(Boolean(launch));
-      expect(module.canonical.route).not.toHaveProperty("url");
-      for (const route of [module.application?.route, module.canonical.route]) {
+      const canonicalURL = canonicalRoutes.get(module.id);
+      if (canonicalURL) {
+        expect(module.canonical.route).toEqual({ visibility: "public-safe", url: canonicalURL });
+      } else {
+        expect(module.canonical.route).not.toHaveProperty("url");
+      }
+      for (const route of [module.application?.route]) {
         if (route?.visibility === "public-safe" || route?.visibility === "approved-authenticated-launch") {
           const url = new URL(route.url);
           expect(url.protocol).toBe("https:");
@@ -51,7 +62,9 @@ describe("public navigation manifest", () => {
       status: "live",
       route: { visibility: "approved-authenticated-launch", url: allowed[2] },
     });
-    expect(JSON.stringify(navigationManifest).replaceAll(allowed[2], "")).not.toMatch(/notion\.(?:so|com)\/p\/|chatgpt\.site|[a-f\d]{32}/i);
+    let remaining = JSON.stringify(navigationManifest).replaceAll(allowed[2], "");
+    for (const url of canonicalRoutes.values()) remaining = remaining.replaceAll(url, "");
+    expect(remaining).not.toMatch(/notion\.(?:so|com)\/p\/|chatgpt\.site|[a-f\d]{32}/i);
   });
 
   it("distinguishes publication review, authenticated delivery, and unknown launch routes", () => {

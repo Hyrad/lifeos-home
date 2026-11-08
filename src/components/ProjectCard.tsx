@@ -13,7 +13,7 @@ export function ProjectCard({ item }: { item: ProjectDestination }) {
         <p>{item.description}</p>
         <span className="project-access">
           <LockKeyhole size={12} aria-hidden="true" />
-          Find in Notion
+          {item.actionLabel ?? "Find in Notion"}
           <ArrowUpRight size={14} aria-hidden="true" />
         </span>
       </External>

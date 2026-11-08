@@ -223,14 +223,14 @@ export default function App() {
                   key={item.title}
                   href={item.href}
                   className="surface-card"
-                  aria-label={`Find ${item.title} in Notion (opens in a new tab)`}
+                  aria-label={`${item.actionLabel ?? `Find ${item.title} in Notion`} (opens in a new tab)`}
                 >
                   <IconBox icon={item.icon} tone={item.tone} />
                   <div>
                     <h3>
                       {item.title} <ArrowUpRight size={14} aria-hidden="true" />
                     </h3>
-                    <p>{item.description}</p>
+                    <p>{item.actionLabel ?? item.description}</p>
                     <span className="surface-identity">
                       {item.type} · {item.domain}
                     </span>
@@ -276,7 +276,7 @@ export default function App() {
                     key={item.title}
                     href={item.href}
                     className="domain-card"
-                      aria-label={`Find ${item.title} in Notion (opens in a new tab)`}
+                      aria-label={`${item.actionLabel ?? `Find ${item.title} in Notion`} (opens in a new tab)`}
                   >
                     <IconBox icon={item.icon} tone={item.tone} small />
                     <span>{item.title}</span>
@@ -323,20 +323,20 @@ export default function App() {
               <SectionHeading
                 id="actions-title"
                 title="Core LifeOS"
-                subtitle="Calendar opens directly. Notion records show their access status."
+                subtitle="Calendar opens directly. Cookbook and Shopping Hub open from Surfaces."
               />
               <div className="action-list">
-                {coreDestinations.map(({ title, icon, tone, route }) => {
+                {coreDestinations.map(({ title, icon, tone, route, linkSection }) => {
                   const content = (
                     <>
                       <IconBox icon={icon} tone={tone} small />
                       <div>
                         <h3>{title}</h3>
-                        <p>{route.visibility === "public-safe" ? "Open Google Calendar" : routeAccessLabel(route)}</p>
+                        <p>{linkSection ? "Direct Notion link in Surfaces" : route.visibility === "public-safe" ? "Open Google Calendar" : routeAccessLabel(route)}</p>
                       </div>
                     </>
                   );
-                  return route.visibility === "public-safe" ? (
+                  return route.visibility === "public-safe" && !linkSection ? (
                     <External href={route.url} key={title} className="action-row">
                       {content}
                       <ArrowUpRight size={15} className="outbound" aria-hidden="true" />
