@@ -32,10 +32,15 @@ const privateReferences = /notion\.(?:com|so)\/p\/|\b[a-f0-9]{32}\b|\b[a-f0-9]{8
 async function scan(path) {
   const text = await readFile(path, "utf8");
   assert.ok(!secrets.test(text), `Credential pattern in ${path}`);
-  const remaining = text.replace(/https?:\/\/[^\s"'<>\x60\\)]+/g, (url) => {
+  const remaining = text.replace(/https?:\/\/[^\s"'<>\x60\\)]+/g, (url, offset) => {
     // Bundled framework code includes React errors and standard XML/SVG namespaces.
     assert.ok(approved.has(url) || standardURLs.has(url), `Unexpected URL in ${path}`);
     if (approvedNotion.has(url)) {
+      const quote = text[offset - 1];
+      assert.ok(
+        ["'", '"', "`"].includes(quote) && text[offset + url.length] === quote,
+        `Expected an exact Notion URL literal in ${path}`,
+      );
       foundNotion.add(url);
       return "";
     }
