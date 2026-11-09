@@ -1,4 +1,4 @@
-import type { ApplicationRoute, ModuleDefinition } from "../types/module";
+import type { ApplicationRoute, Deployment, ModuleDefinition } from "../types/module";
 
 export const winePageURL = "https://hyrad.github.io/lifeos-wine-production/";
 export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
@@ -25,6 +25,7 @@ export function routeAccessLabel(route: ApplicationRoute) {
     "publication-review": "Direct link needs publication approval",
     "authenticated-only": "Private link requires authenticated delivery",
     "pending-review": "Destination unverified",
+    "private-deployment": "Opens from the private LifeOS server",
   }[route.visibility];
 }
 const privateApp = {
@@ -121,7 +122,14 @@ export const navigationManifest = {
       id: "cooking", label: "Cooking", description: "Recipe and cooking references.",
       domain: "Food & drink", icon: "food", tone: "amber", status: "active",
       canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: approvedNotionRoutes.cookbook, linkSection: "surfaces" },
-      related: ["shopping"], evidence: "Cuisine owner and Cookbook",
+      // LIFEOS-COOK-01: independent app. Status stays "planned" until private
+      // hosting and iPad acceptance are approved; then set it to "live".
+      application: {
+        label: "LifeOS Cooking", status: "planned", installation: "standalone-manifest",
+        route: { visibility: "private-deployment", path: "/lifeos-cooking/" },
+      },
+      placement: ["apps", "workstreams"],
+      related: ["shopping"], evidence: "Cuisine owner, Cookbook and LifeOS Cooking review branch",
     },
     {
       ...directoryEntry,
@@ -155,6 +163,26 @@ export function publicLaunchURL(module: ModuleDefinition) {
   if (app.route.visibility === "public-safe" || app.route.visibility === "approved-authenticated-launch") {
     return app.route.url;
   }
+}
+
+// Build-time deployment. GitHub Pages builds are "public" (the default); only
+// the private LifeOS server release sets VITE_LIFEOS_DEPLOYMENT=private-server.
+export function currentDeployment(): Deployment {
+  return import.meta.env.VITE_LIFEOS_DEPLOYMENT === "private-server" ? "private-server" : "public";
+}
+
+/** Launch address for this deployment: approved URLs everywhere, same-origin private paths only on the server. */
+export function launchURL(module: ModuleDefinition, deployment: Deployment = currentDeployment()) {
+  const app = module.application;
+  if (app?.status === "live" && app.route.visibility === "private-deployment") {
+    return deployment === "private-server" ? app.route.path : undefined;
+  }
+  return publicLaunchURL(module);
+}
+
+/** Apps entries that cannot launch from this deployment but should stay discoverable. */
+export function isPrivateServerApp(module: ModuleDefinition) {
+  return module.application?.route.visibility === "private-deployment";
 }
 
 export const homeSections = [

@@ -3,7 +3,14 @@ export type PublicationRoute =
   | { visibility: "public-safe"; url: string }
   | { visibility: "authenticated-only" | "publication-review" | "pending-review"; url?: never };
 
-export type ApplicationRoute = PublicationRoute | { visibility: "approved-authenticated-launch"; url: string };
+export type ApplicationRoute =
+  | PublicationRoute
+  | { visibility: "approved-authenticated-launch"; url: string }
+  // Same-origin path served only by the private LifeOS server deployment.
+  // Never a hostname; the public build shows the app without a link.
+  | { visibility: "private-deployment"; path: `/${string}/`; url?: never };
+
+export type Deployment = "public" | "private-server";
 
 export interface ModuleDefinition {
   id: string;

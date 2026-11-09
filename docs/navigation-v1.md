@@ -31,6 +31,7 @@ Notion controls content access and sign-in. Approval covers the exact URLs only.
 | Music, CasinoAcademy | Private app links held in owner records | Private Notion workspace |
 | Game Shelf | Private hosting gate | Private development Surface |
 | Family technology, founder workspace | Launch routes withheld pending verification | Private access |
+| LifeOS Cooking | Listed in Apps without a link. COOK-01 classifies it as a private-server app on the same-origin path `/lifeos-cooking/`, launchable only from a build with `VITE_LIFEOS_DEPLOYMENT=private-server` once its status is `live` | Approved Cookbook link in Surfaces (unchanged) |
 | Cooking and Shopping | Directory entries | Approved Cookbook and Shopping Hub links in Surfaces |
 | Fitness, Game development, LifeOS Home records | Directory entries | Private Notion workspace |
 
@@ -60,6 +61,10 @@ The earlier public edition included direct addresses for selected Notion records
 Approve category B addresses individually after reviewing metadata on signed-out access. Category C requires authenticated delivery in the same Home UI. Public GitHub Pages can keep serving the current shell and cannot deliver restricted data itself. Existing owner-private Sites confirm a managed access option. A separately authorized pilot could use the same Home source and UI on an owner-private origin if unauthenticated requests for HTML, assets and route payloads are all denied. A change of origin needs a Home Screen reinstall and return-path acceptance.
 
 If the current Pages origin must remain the installed entry, evaluate an owner-authenticated route endpoint consumed by Home. Validate identity and authorization server-side on every request, restrict browser origins, send private responses with `Cache-Control: no-store`, and keep restricted inventory outside the public repository and build. Verify login and return behavior in standalone Safari without assuming cross-site cookies. Keep route-only data and existing Notion permissions. No provider, session or hosting change is part of NAV-04.
+
+## Private-server apps (COOK-01)
+
+A `private-deployment` application route holds only a same-origin path, never a hostname or port. The public GitHub Pages build (the default) lists the app in Apps with its status and no link. The private LifeOS server release, built with `VITE_LIFEOS_DEPLOYMENT=private-server`, links the path once the app status is `live`. Both builds pass the same artifact boundary scan. Turning on the Cooking launch takes three approved steps: the Serve path for `/lifeos-cooking/`, the release-script build flag, and changing the status to `live` after iPad acceptance.
 
 ## Change a route
 

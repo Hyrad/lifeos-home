@@ -2,7 +2,7 @@ import {
   ArrowUpRight, Compass, Dumbbell, Gamepad2, HeartPulse, Layers3,
   Music2, Plane, ShoppingBag, Soup, Users, Wine,
 } from "lucide-react";
-import { modules, notionLauncherURL, publicLaunchURL, routeAccessLabel } from "../data/modules";
+import { isPrivateServerApp, launchURL, modules, notionLauncherURL, routeAccessLabel } from "../data/modules";
 import { External, IconBox, SectionHeading } from "./Shared";
 
 const icons = {
@@ -25,8 +25,20 @@ export function NavigationDirectory() {
         <SectionHeading id="apps-title" title="Apps" subtitle="Open a LifeOS app. Some apps require sign-in." />
         <div className="surface-grid">
           {modules.filter(module => module.placement.includes("apps")).map(module => {
-            const url = publicLaunchURL(module);
-            if (!url) return null;
+            const url = launchURL(module);
+            if (!url) {
+              if (!isPrivateServerApp(module)) return null;
+              const app = module.application!;
+              return (
+                <div className="surface-card" key={module.id}>
+                  <IconBox icon={icons[module.icon]} tone={module.tone} />
+                  <div>
+                    <h3>{app.label ?? module.label}</h3>
+                    <p>{module.description} {appState[app.status]} · {routeAccessLabel(app.route)}.</p>
+                  </div>
+                </div>
+              );
+            }
             return (
               <a className="surface-card" key={module.id} href={url}>
                 <IconBox icon={icons[module.icon]} tone={module.tone} />
@@ -51,7 +63,7 @@ export function NavigationDirectory() {
         <ul className="directory-list">
           {modules.filter(module => module.placement.includes("workstreams")).map(module => {
             const { canonical, application } = module;
-            const launch = publicLaunchURL(module);
+            const launch = launchURL(module);
             const appLabel = application?.label ?? module.label;
             return (
               <li key={module.id}>

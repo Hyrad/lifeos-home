@@ -41,6 +41,10 @@ describe("Independent module navigation", () => {
     expect(apps.getByRole("link", { name: /^Open Wine Production/ })).toHaveAttribute("href", winePageURL);
     expect(apps.getByRole("link", { name: /^Open Journey Tracker/ })).toHaveAttribute("href", journeyPageURL);
     expect(apps.getAllByRole("link")).toHaveLength(3);
+    // LifeOS Cooking is discoverable but has no link in the public build.
+    expect(apps.getByRole("heading", { name: "LifeOS Cooking" })).toBeVisible();
+    expect(apps.getByText(/App planned · Opens from the private LifeOS server/)).toBeVisible();
+    expect(apps.queryByRole("link", { name: /Cooking/ })).not.toBeInTheDocument();
     const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
     expect(workstreams.getByRole("heading", { name: "Music Creative Dashboard" })).toBeVisible();
     expect(workstreams.getByRole("heading", { name: "Game Shelf Development" })).toBeVisible();

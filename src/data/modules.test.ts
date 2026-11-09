@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { modules, navigationManifest, publicLaunchURL } from "./modules";
+import { isPrivateServerApp, launchURL, modules, navigationManifest, publicLaunchURL } from "./modules";
 
 describe("public navigation manifest", () => {
   it("versions the contract and requires stable IDs, display fields and evidence", () => {
@@ -37,7 +37,7 @@ describe("public navigation manifest", () => {
     const launches = [];
     for (const module of modules) {
       const launch = publicLaunchURL(module);
-      expect(module.placement.includes("apps")).toBe(Boolean(launch));
+      expect(module.placement.includes("apps")).toBe(Boolean(launch) || isPrivateServerApp(module));
       const canonicalURL = canonicalRoutes.get(module.id);
       if (canonicalURL) {
         expect(module.canonical.route).toEqual({ visibility: "public-safe", url: canonicalURL });
@@ -75,6 +75,40 @@ describe("public navigation manifest", () => {
     expect(routes["family-technology"].application).toMatchObject({ status: "unverified", route: { visibility: "pending-review" } });
     expect(routes["game-shelf"].application).toMatchObject({ status: "blocked", route: { visibility: "pending-review" } });
     expect(routes.founder.application).toMatchObject({ status: "live", route: { visibility: "pending-review" } });
+  });
+
+  it("adds LifeOS Cooking as a private-server app without changing the Cookbook route", () => {
+    const cooking = modules.find(module => module.id === "cooking")!;
+    expect(cooking.canonical).toEqual({
+      owner: "area", role: "reference", label: "Cooking / Cookbook",
+      route: { visibility: "public-safe", url: "https://app.notion.com/p/3f1be780ce1a81f68849e982dfcc4922" },
+      linkSection: "surfaces",
+    });
+    expect(cooking.application).toEqual({
+      label: "LifeOS Cooking", status: "planned", installation: "standalone-manifest",
+      route: { visibility: "private-deployment", path: "/lifeos-cooking/" },
+    });
+    expect(cooking.placement).toEqual(["apps", "workstreams"]);
+    // Not launchable anywhere while planned; never a hostname.
+    expect(launchURL(cooking, "public")).toBeUndefined();
+    expect(launchURL(cooking, "private-server")).toBeUndefined();
+    expect(JSON.stringify(cooking)).not.toMatch(/ts\.net|tailscale|localhost|127\.0\.0\.1|:\d{4,5}/i);
+  });
+
+  it("resolves private-deployment routes only on the private server once live", () => {
+    const cooking = modules.find(module => module.id === "cooking")!;
+    const live = { ...cooking, application: { ...cooking.application!, status: "live" as const } };
+    expect(launchURL(live, "public")).toBeUndefined();
+    expect(launchURL(live, "private-server")).toBe("/lifeos-cooking/");
+    expect(publicLaunchURL(live)).toBeUndefined();
+    // Existing approved launches are unchanged in both deployments.
+    for (const id of ["wine", "travel", "health"]) {
+      const module = modules.find(item => item.id === id)!;
+      expect(launchURL(module, "private-server")).toBe(publicLaunchURL(module));
+      expect(launchURL(module, "public")).toBe(publicLaunchURL(module));
+    }
+    // Default (public) deployment in tests and GitHub Pages builds.
+    expect(launchURL(live)).toBeUndefined();
   });
 
   it("keeps a generic fallback for restricted and absent launch routes", () => {
