@@ -5,6 +5,8 @@ import AxeBuilder from "@axe-core/playwright";
 
 // Run against a production preview or the deployed GitHub Pages site.
 const url = process.env.CHECK_URL || "http://127.0.0.1:4173/lifeos-home/";
+// Set CHECK_DEPLOYMENT=private-server when checking the private LifeOS server build.
+const privateServer = process.env.CHECK_DEPLOYMENT === "private-server";
 const { version } = JSON.parse(
   await readFile(new URL("../package.json", import.meta.url), "utf8"),
 );
@@ -98,6 +100,17 @@ try {
       assert.ok((await launch.boundingBox()).height >= 44, `${name}: ${label} touch target`);
     }
     assert.match(await apps.getByRole("link", { name: /^Open Health/ }).innerText(), /Sign-in required/);
+    // LifeOS Cooking: a same-origin link on the private server build, listed without a link elsewhere.
+    const cookingLinks = apps.getByRole("link", { name: /^Open LifeOS Cooking/ });
+    if (privateServer) {
+      assert.equal(await cookingLinks.count(), 1, `${name}: LifeOS Cooking app link`);
+      assert.equal(await cookingLinks.getAttribute("href"), "/lifeos-cooking/");
+      assert.equal(await cookingLinks.getAttribute("target"), null);
+      assert.ok((await cookingLinks.boundingBox()).height >= 44, `${name}: LifeOS Cooking touch target`);
+    } else {
+      assert.equal(await cookingLinks.count(), 0, `${name}: no Cooking link in the public build`);
+      assert.ok(await apps.getByRole("heading", { name: "LifeOS Cooking" }).isVisible(), `${name}: LifeOS Cooking listed`);
+    }
     if (width > 700) {
       const health = directoryNav.getByRole("link", { name: "Health", exact: true });
       assert.equal(await health.getAttribute("href"), healthURL);
@@ -305,6 +318,21 @@ try {
     await popup.close();
   }
   console.log("Four exact Notion outbound navigations passed with intercepted destination responses.");
+  if (privateServer) {
+    // Real round trip on the private server: Home → LifeOS Cooking → Home.
+    for (const size of [{ width: 820, height: 1180 }, { width: 1440, height: 900 }]) {
+      await launchPage.setViewportSize(size);
+      await launchPage.goto(url);
+      await launchPage.getByRole("region", { name: "Apps" }).getByRole("link", { name: /^Open LifeOS Cooking/ }).click();
+      await launchPage.waitForURL(new URL("/lifeos-cooking/", url).href);
+      await launchPage.locator("main h1").waitFor();
+      assert.match(await launchPage.getByRole("link", { name: /^LifeOS Cooking v\d+\.\d+\.\d+, kitchen home$/ }).getAttribute("aria-label"), /LifeOS Cooking v/);
+      await launchPage.getByRole("link", { name: "LifeOS Home" }).click();
+      await launchPage.waitForURL(new URL("/lifeos-home/", url).href);
+      await launchPage.getByRole("region", { name: "Apps" }).waitFor();
+    }
+    console.log("Home → LifeOS Cooking → Home passed on the private server at iPad and desktop sizes.");
+  }
   await launchPage.close();
   console.log("Journey Tracker and Health launch URLs passed with intercepted destination responses.");
   console.log(

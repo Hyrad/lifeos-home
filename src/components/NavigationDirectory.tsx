@@ -43,7 +43,7 @@ export function NavigationDirectory() {
               <a className="surface-card" key={module.id} href={url}>
                 <IconBox icon={icons[module.icon]} tone={module.tone} />
                 <div>
-                  <h3>Open {module.label} <ArrowUpRight size={14} aria-hidden="true" /></h3>
+                  <h3>Open {module.application?.label ?? module.label} <ArrowUpRight size={14} aria-hidden="true" /></h3>
                   <p>{module.description} {module.application?.route.visibility === "approved-authenticated-launch" && "Sign-in required."}</p>
                 </div>
               </a>

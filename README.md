@@ -10,7 +10,7 @@ A responsive, dark-theme personal dashboard built with React, TypeScript, and Vi
 
 ## Included
 
-- **Apps** launches Wine Production, Journey Tracker and Health from Home in two interactions or fewer. Health requires its own owner sign-in.
+- **Apps** launches Wine Production, Journey Tracker and Health from Home in two interactions or fewer. Health requires its own owner sign-in. LifeOS Cooking is listed as its own app and opens only from the private server deployment.
 - **Workstreams** separates canonical Notion records from app launches and shows publication, access, and availability states. The generic Notion entry is a manual lookup fallback.
 - **Core LifeOS** preserves direct Calendar access and lists the six canonical Notion destinations with their access states. Its anchor remains `#actions`.
 - Desktop and mobile give Apps, Workstreams, Projects, Core LifeOS, and Life domains their own section links. Today, Upcoming, Surfaces, domain search, and System overview remain available.
@@ -87,6 +87,10 @@ wine/redirect.ts            Redirect preserves query and section anchor
 ```
 
 Change Tasks, Projects, Areas, Notes, Reviews, Calendar, and automations in their original systems. This page is a convenience window, not a second personal database.
+
+## v0.3.2: LifeOS Cooking in Apps
+
+LifeOS Cooking is listed as its own application in Apps and Workstreams. The private server build opens it from the same origin; the public build shows it without a link and contains no private address. See [v0.3.2 release notes](docs/release-v0.3.2.md).
 
 ## Maintenance v0.3.1
 

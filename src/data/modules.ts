@@ -119,17 +119,18 @@ export const navigationManifest = {
     },
     {
       ...directoryEntry,
-      id: "cooking", label: "Cooking", description: "Recipe and cooking references.",
+      id: "cooking", label: "Cooking", description: "Kitchen companion: guided recipes, servings and timers.",
       domain: "Food & drink", icon: "food", tone: "amber", status: "active",
       canonical: { owner: "area", role: "reference", label: "Cooking / Cookbook", route: approvedNotionRoutes.cookbook, linkSection: "surfaces" },
-      // LIFEOS-COOK-01: independent app. Status stays "planned" until private
-      // hosting and iPad acceptance are approved; then set it to "live".
+      // LIFEOS-COOK-03: independent app, privately hosted (COOK-02) and accepted
+      // on iPad. Launchable only from the private-server build; the public
+      // build lists it without a link and never contains a hostname.
       application: {
-        label: "LifeOS Cooking", status: "planned", installation: "standalone-manifest",
+        label: "LifeOS Cooking", status: "live", installation: "standalone-manifest",
         route: { visibility: "private-deployment", path: "/lifeos-cooking/" },
       },
       placement: ["apps", "workstreams"],
-      related: ["shopping"], evidence: "Cuisine owner, Cookbook and LifeOS Cooking review branch",
+      related: ["shopping"], evidence: "Cuisine owner, Cookbook and LifeOS Cooking private deployment (COOK-02)",
     },
     {
       ...directoryEntry,

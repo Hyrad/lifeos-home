@@ -31,7 +31,7 @@ Notion controls content access and sign-in. Approval covers the exact URLs only.
 | Music, CasinoAcademy | Private app links held in owner records | Private Notion workspace |
 | Game Shelf | Private hosting gate | Private development Surface |
 | Family technology, founder workspace | Launch routes withheld pending verification | Private access |
-| LifeOS Cooking | Listed in Apps without a link. COOK-01 classifies it as a private-server app on the same-origin path `/lifeos-cooking/`, launchable only from a build with `VITE_LIFEOS_DEPLOYMENT=private-server` once its status is `live` | Approved Cookbook link in Surfaces (unchanged) |
+| LifeOS Cooking | Live private-server app (COOK-03). The private server build links the same-origin path `/lifeos-cooking/`; the public build lists it in Apps without a link | Approved Cookbook link in Surfaces (unchanged) |
 | Cooking and Shopping | Directory entries | Approved Cookbook and Shopping Hub links in Surfaces |
 | Fitness, Game development, LifeOS Home records | Directory entries | Private Notion workspace |
 
@@ -64,7 +64,7 @@ If the current Pages origin must remain the installed entry, evaluate an owner-a
 
 ## Private-server apps (COOK-01)
 
-A `private-deployment` application route holds only a same-origin path, never a hostname or port. The public GitHub Pages build (the default) lists the app in Apps with its status and no link. The private LifeOS server release, built with `VITE_LIFEOS_DEPLOYMENT=private-server`, links the path once the app status is `live`. Both builds pass the same artifact boundary scan. Turning on the Cooking launch takes three approved steps: the Serve path for `/lifeos-cooking/`, the release-script build flag, and changing the status to `live` after iPad acceptance.
+A `private-deployment` application route holds only a same-origin path, never a hostname or port. The public GitHub Pages build (the default) lists the app in Apps with its status and no link. The private LifeOS server release, built with `VITE_LIFEOS_DEPLOYMENT=private-server`, links the path once the app status is `live`. Both builds pass the same artifact boundary scan. LifeOS Cooking became `live` in v0.3.2 (COOK-03) after its private hosting and device acceptance.
 
 ## Change a route
 

@@ -1,5 +1,5 @@
 import { render, screen, within } from "@testing-library/react";
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import App from "./App";
 import { journeyPageURL, notionLauncherURL, winePageURL } from "./data/modules";
 
@@ -43,7 +43,7 @@ describe("Independent module navigation", () => {
     expect(apps.getAllByRole("link")).toHaveLength(3);
     // LifeOS Cooking is discoverable but has no link in the public build.
     expect(apps.getByRole("heading", { name: "LifeOS Cooking" })).toBeVisible();
-    expect(apps.getByText(/App planned · Opens from the private LifeOS server/)).toBeVisible();
+    expect(apps.getByText(/Live app · Opens from the private LifeOS server/)).toBeVisible();
     expect(apps.queryByRole("link", { name: /Cooking/ })).not.toBeInTheDocument();
     const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
     expect(workstreams.getByRole("heading", { name: "Music Creative Dashboard" })).toBeVisible();
@@ -59,6 +59,25 @@ describe("Independent module navigation", () => {
     expect(workstreams.getByText(/App availability unverified · Destination unverified/)).toBeVisible();
     expect(workstreams.getAllByText(/Direct link needs publication approval/)).not.toHaveLength(0);
     expect(workstreams.getByRole("link", { name: /Open Notion/ })).toHaveAttribute("href", notionLauncherURL);
+  });
+
+  it("links LifeOS Cooking by same-origin path only in the private-server build", () => {
+    vi.stubEnv("VITE_LIFEOS_DEPLOYMENT", "private-server");
+    try {
+      render(<App />);
+      const apps = within(screen.getByRole("region", { name: "Apps" }));
+      const cooking = apps.getByRole("link", { name: /^Open LifeOS Cooking/ });
+      expect(cooking).toHaveAttribute("href", "/lifeos-cooking/");
+      expect(cooking).not.toHaveAttribute("target");
+      expect(apps.getAllByRole("link")).toHaveLength(4);
+      // Existing approved launches are unchanged.
+      expect(apps.getByRole("link", { name: /^Open Wine Production/ })).toHaveAttribute("href", winePageURL);
+      expect(apps.getByRole("link", { name: /^Open Journey Tracker/ })).toHaveAttribute("href", journeyPageURL);
+      const workstreams = within(screen.getByRole("region", { name: "Workstreams" }));
+      expect(workstreams.getByRole("link", { name: /^Open LifeOS Cooking app/ })).toHaveAttribute("href", "/lifeos-cooking/");
+    } finally {
+      vi.unstubAllEnvs();
+    }
   });
 
   it("keeps projects distinct from their software and uses honest access routes", () => {

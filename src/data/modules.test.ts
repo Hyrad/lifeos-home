@@ -77,7 +77,7 @@ describe("public navigation manifest", () => {
     expect(routes.founder.application).toMatchObject({ status: "live", route: { visibility: "pending-review" } });
   });
 
-  it("adds LifeOS Cooking as a private-server app without changing the Cookbook route", () => {
+  it("lists LifeOS Cooking as a live private-server app without changing the Cookbook route", () => {
     const cooking = modules.find(module => module.id === "cooking")!;
     expect(cooking.canonical).toEqual({
       owner: "area", role: "reference", label: "Cooking / Cookbook",
@@ -85,13 +85,13 @@ describe("public navigation manifest", () => {
       linkSection: "surfaces",
     });
     expect(cooking.application).toEqual({
-      label: "LifeOS Cooking", status: "planned", installation: "standalone-manifest",
+      label: "LifeOS Cooking", status: "live", installation: "standalone-manifest",
       route: { visibility: "private-deployment", path: "/lifeos-cooking/" },
     });
     expect(cooking.placement).toEqual(["apps", "workstreams"]);
-    // Not launchable anywhere while planned; never a hostname.
+    // Same-origin path on the private server only; no link in public builds; never a hostname.
     expect(launchURL(cooking, "public")).toBeUndefined();
-    expect(launchURL(cooking, "private-server")).toBeUndefined();
+    expect(launchURL(cooking, "private-server")).toBe("/lifeos-cooking/");
     expect(JSON.stringify(cooking)).not.toMatch(/ts\.net|tailscale|localhost|127\.0\.0\.1|:\d{4,5}/i);
   });
 
