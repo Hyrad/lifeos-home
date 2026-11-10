@@ -130,7 +130,8 @@ try {
     assert.equal(await privateFallback.getAttribute("rel"), "noopener noreferrer");
     assert.ok((await privateFallback.boundingBox()).height >= 44, `${name}: Notion touch target`);
     assert.deepEqual(await workstreams.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
-      [notionURL, notionRecords[0][2], wineURL, notionRecords[1][2], journeyURL, healthURL]);
+      [notionURL, notionRecords[0][2], wineURL, notionRecords[1][2], journeyURL, healthURL,
+        ...(privateServer ? ["/lifeos-cooking/"] : [])]);
     const core = page.getByRole("region", { name: "Core LifeOS" });
     assert.deepEqual(await core.getByRole("link").evaluateAll(links => links.map(link => link.getAttribute("href"))),
       [calendarURL, notionURL]);
