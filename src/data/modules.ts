@@ -1,4 +1,5 @@
 import type { ApplicationRoute, Deployment, ModuleDefinition } from "../types/module";
+import type { PlatformRegistry } from "./platform";
 
 export const winePageURL = "https://hyrad.github.io/lifeos-wine-production/";
 export const journeyPageURL = "https://hyrad.github.io/journey-tracker/";
@@ -172,9 +173,15 @@ export function currentDeployment(): Deployment {
   return import.meta.env.VITE_LIFEOS_DEPLOYMENT === "private-server" ? "private-server" : "public";
 }
 
-/** Launch address for this deployment: approved URLs everywhere, same-origin private paths only on the server. */
-export function launchURL(module: ModuleDefinition, deployment: Deployment = currentDeployment()) {
+/** Launch address for this deployment: approved URLs everywhere, same-origin private paths only on the server.
+ *  On the shared private platform, its registry decides availability of same-origin app routes. */
+export function launchURL(module: ModuleDefinition, deployment: Deployment = currentDeployment(), registry?: PlatformRegistry) {
   const app = module.application;
+  const platform = deployment === "private-server" ? registry?.get(module.id) : undefined;
+  if (platform) {
+    if (platform.status === "available") return platform.route;
+    return app?.route.visibility === "private-deployment" ? undefined : publicLaunchURL(module);
+  }
   if (app?.status === "live" && app.route.visibility === "private-deployment") {
     return deployment === "private-server" ? app.route.path : undefined;
   }

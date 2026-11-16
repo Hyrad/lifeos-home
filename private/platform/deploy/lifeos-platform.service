@@ -1,0 +1,45 @@
+# LifeOS private platform (LIFEOS-PLATFORM-02). Unix socket only; reached solely through one
+# dedicated Tailscale Serve HTTPS handler. Template: install via deploy/activate.py, never by hand.
+#
+# Network: AF_UNIX only and no IP access while Wine live data and the Device API are disabled.
+# Enabling either requires an explicitly reviewed variant adding AF_INET/AF_INET6, an IPAddressAllow
+# policy for the fixed provider hosts, and LoadCredential lines for the owner-provisioned files.
+[Unit]
+Description=LifeOS private platform (Unix socket; tailnet via Tailscale Serve, dedicated port)
+StartLimitIntervalSec=120
+StartLimitBurst=5
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/lifeos-platform
+RuntimeDirectory=lifeos-platform
+RuntimeDirectoryMode=0700
+Environment=PYTHONUNBUFFERED=1
+Environment=PYTHONDONTWRITEBYTECODE=1
+ExecStart=/usr/bin/python3 -I %h/.local/share/lifeos-platform/current/server/run.py serve --config %h/.config/lifeos-platform/platform.json --socket %t/lifeos-platform/platform.sock
+Restart=on-failure
+RestartSec=3
+
+MemoryHigh=64M
+MemoryMax=96M
+MemorySwapMax=16M
+TasksMax=32
+CPUQuota=50%
+LimitNOFILE=256
+LimitCORE=0
+
+NoNewPrivileges=yes
+UMask=0077
+PrivateTmp=yes
+ProtectSystem=strict
+ProtectHome=read-only
+ReadWritePaths=%h/.local/state/lifeos-platform
+RestrictAddressFamilies=AF_UNIX
+IPAddressDeny=any
+LockPersonality=yes
+RestrictRealtime=yes
+RestrictSUIDSGID=yes
+SystemCallArchitectures=native
+
+[Install]
+WantedBy=default.target

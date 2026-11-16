@@ -2,7 +2,8 @@ import {
   ArrowUpRight, Compass, Dumbbell, Gamepad2, HeartPulse, Layers3,
   Music2, Plane, ShoppingBag, Soup, Users, Wine,
 } from "lucide-react";
-import { isPrivateServerApp, launchURL, modules, notionLauncherURL, routeAccessLabel } from "../data/modules";
+import { currentDeployment, isPrivateServerApp, launchURL, modules, notionLauncherURL, routeAccessLabel } from "../data/modules";
+import { platformStatusLabel, usePlatformRegistry } from "../data/platform";
 import { External, IconBox, SectionHeading } from "./Shared";
 
 const icons = {
@@ -19,13 +20,15 @@ const appState = {
 };
 
 export function NavigationDirectory() {
+  const deployment = currentDeployment();
+  const registry = usePlatformRegistry(deployment);
   return (
     <>
       <section className="section" id="apps" aria-labelledby="apps-title">
         <SectionHeading id="apps-title" title="Apps" subtitle="Open a LifeOS app. Some apps require sign-in." />
         <div className="surface-grid">
           {modules.filter(module => module.placement.includes("apps")).map(module => {
-            const url = launchURL(module);
+            const url = launchURL(module, deployment, registry);
             if (!url) {
               if (!isPrivateServerApp(module)) return null;
               const app = module.application!;
@@ -34,7 +37,8 @@ export function NavigationDirectory() {
                   <IconBox icon={icons[module.icon]} tone={module.tone} />
                   <div>
                     <h3>{app.label ?? module.label}</h3>
-                    <p>{module.description} {appState[app.status]} · {routeAccessLabel(app.route)}.</p>
+                    <p>{module.description} {appState[app.status]} · {registry?.get(module.id)
+                      ? platformStatusLabel(registry.get(module.id)!.status) : routeAccessLabel(app.route)}.</p>
                   </div>
                 </div>
               );
@@ -63,7 +67,7 @@ export function NavigationDirectory() {
         <ul className="directory-list">
           {modules.filter(module => module.placement.includes("workstreams")).map(module => {
             const { canonical, application } = module;
-            const launch = launchURL(module);
+            const launch = launchURL(module, deployment, registry);
             const appLabel = application?.label ?? module.label;
             return (
               <li key={module.id}>
