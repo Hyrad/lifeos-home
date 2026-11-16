@@ -13,6 +13,7 @@ import datetime as dt
 import hashlib
 import json
 import os
+import re
 from pathlib import Path
 import shutil
 import stat
@@ -22,7 +23,7 @@ import sys
 HERE = Path(__file__).resolve().parents[1]
 FORBIDDEN_NAMES = {'platform.json', 'notion-token', 'tailscale-oauth-id', 'tailscale-oauth-secret', '.env'}
 FORBIDDEN_SUFFIXES = ('.sqlite3', '.gpg', '.key', '.pem', '.map')
-FORBIDDEN_TEXT = ('ntn_', 'secret_', 'tskey-', 'BEGIN PGP PRIVATE', 'BEGIN PRIVATE KEY')
+FORBIDDEN_TEXT = re.compile(rb'(?:ntn_|secret_)[A-Za-z0-9]{20,}|tskey-[A-Za-z0-9-]{16,}|BEGIN PGP PRIVATE|BEGIN [A-Z ]*PRIVATE KEY')
 
 
 def sha(p):
@@ -42,9 +43,8 @@ def scan(root):
             if p.name in FORBIDDEN_NAMES or p.suffix in FORBIDDEN_SUFFIXES:
                 raise SystemExit(f'forbidden file in artifact: {p.name}')
             data = p.read_bytes()
-            for marker in FORBIDDEN_TEXT:
-                if marker.encode() in data:
-                    raise SystemExit(f'credential-like text in artifact: {p.name}')
+            if FORBIDDEN_TEXT.search(data):
+                raise SystemExit(f'credential-like text in artifact: {p.name}')
 
 
 def freeze(root):
