@@ -88,8 +88,8 @@ class SessionStoreTests(Folder):
         self.assertEqual(self.s.write(0, BODY)[0], 409)
         self.assertEqual(self.s.write(2, BODY)[0], 409)
         self.assertEqual(self.s.write(1, {**BODY, 'step': 2})[1]['session']['revision'], 2)
-        self.assertEqual(self.s.write(2, None), (200, {'session': None}))
-        self.assertIsNone(self.s.get())
+        self.assertEqual(self.s.write(2, None), (200, {'session': None, 'revision': 3}))
+        self.assertEqual(self.s.get(), (3, None))
 
     def test_concurrent_writers_exactly_one_wins(self):
         self.s.write(0, BODY)
@@ -100,7 +100,7 @@ class SessionStoreTests(Folder):
         threads = [threading.Thread(target=go, args=(o, i)) for i, o in enumerate(others)]
         [t.start() for t in threads]; [t.join() for t in threads]; [o.close() for o in others]
         self.assertEqual(sorted(results), [200] + [409] * 5)
-        self.assertEqual(self.s.get()['revision'], 2)
+        self.assertEqual(self.s.get()[0], 2)
 
     def test_validation_rejects_recipe_content_and_bounds(self):
         for bad in [{**BODY, 'title': 'x'}, {**BODY, 'recipeRef': '../x'}, {**BODY, 'step': -1}, {**BODY, 'step': True},
@@ -108,13 +108,24 @@ class SessionStoreTests(Folder):
                     {**BODY, 'timers': [{'id': 'a', 'deadline': 1}] * 21}, []]:
             with self.subTest(bad=bad), self.assertRaises(Failure):
                 self.s.write(0, bad)
-        self.assertIsNone(self.s.get())
+        self.assertEqual(self.s.get(), (0, None))
 
     def test_retention_purges_stale_session(self):
         self.s.write(0, BODY)
         old = (dt.datetime.now(dt.timezone.utc) - dt.timedelta(hours=49)).isoformat(timespec='seconds').replace('+00:00', 'Z')
         self.s.conn.execute('UPDATE cooking_session SET updated_at=?', (old,))
-        self.assertIsNone(self.s.get())
+        self.assertEqual(self.s.get(), (1, None))
+        # Reads never modify data (read-only mode): the row is still physically present.
+        self.assertIsNotNone(self.s.conn.execute('SELECT body FROM cooking_session').fetchone()[0])
+        self.assertEqual(self.s.write(0, BODY)[0], 409)  # revisions never restart
+        self.assertEqual(self.s.write(1, BODY)[1]['revision'], 2)
+
+    def test_stale_client_cannot_overwrite_session_started_after_delete(self):
+        self.s.write(0, BODY)                                    # tab A holds r1
+        self.s.write(1, None)                                    # device B ends it -> r2 tombstone
+        self.assertEqual(self.s.write(2, {**BODY, 'recipeRef': 'cake'})[0], 200)  # B starts cake -> r3
+        self.assertEqual(self.s.write(1, {**BODY, 'step': 5})[0], 409)            # stale tab A
+        self.assertEqual(self.s.get()[1]['recipeRef'], 'cake')
 
 
 def make_key(home):
@@ -163,13 +174,24 @@ class BackupRestoreTests(Folder):
         self.assertEqual(report['schema_version'], storage.SUPPORTED_VERSION)
         self.assertTrue(report['session_present'])
         restored = storage.CookingSessions(self.dir / 'restored' / 'platform.sqlite3')
-        self.assertEqual(restored.get()['recipeRef'], 'soupe'); restored.close()
+        self.assertEqual(restored.get()[1]['recipeRef'], 'soupe'); restored.close()
 
     def test_restore_without_owner_private_key_fails(self):
         r = self.backup()
         empty = self.dir / 'no-key'; empty.mkdir(mode=0o700)
         with self.assertRaises(subprocess.CalledProcessError):
             backup.restore(self.dest / r['archive'], self.dir / 'restored', empty)
+
+    def test_missing_sidecar_refused_and_failed_encrypt_leaves_no_partial(self):
+        r = self.backup()
+        Path(str(self.dest / r['archive']) + '.json').unlink()
+        with self.assertRaises(backup.BackupError):
+            backup.restore(self.dest / r['archive'], self.dir / 'restored', self.home)
+        bad = self.dir / 'not-a-key.asc'; bad.write_text('garbage')
+        with self.assertRaises(subprocess.CalledProcessError):
+            backup.create_backup(self.db, self.dest, self.data, bad, require_separate_device=False,
+                                 now=dt.datetime(2030, 1, 1, tzinfo=dt.timezone.utc))
+        self.assertEqual([p.name for p in self.dest.iterdir() if p.name.endswith('.partial')], [])
 
     def test_tampered_archive_detected(self):
         r = self.backup()

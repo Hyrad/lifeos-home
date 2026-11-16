@@ -184,7 +184,7 @@ class Handler(BaseHTTPRequestHandler):
             if len(raw_path) > 2048 or sum(len(k) + len(v) for k, v in self.headers.items()) > 16384:
                 raise Failure(431, 'request_too_large')
             path, _, query = raw_path.partition('?')
-            if '%' in raw_path or '..' in path or '//' in path or not SAFE_PATH.fullmatch(path):
+            if '%' in raw_path or '//' in path or not SAFE_PATH.fullmatch(path) or '/.' in path:
                 raise Failure(404, 'not_found')
             kind, resource, api_client, app = route(path)
             cfg = self.server.config.get()
@@ -284,10 +284,9 @@ class Handler(BaseHTTPRequestHandler):
             raise Failure(503, 'sessions_unavailable')
         self.server.rate(('sessions', identity.stable_id), 120)
         if self.command in ('GET', 'HEAD'):
-            value = store.get()
+            revision, value = store.get()
             proxy.check_live()
-            self.json(200, {'session': value, 'writes': self.server.sessions_state(cfg)},
-                      extra={'ETag': '"r%d"' % (value['revision'] if value else 0)})
+            self.json(200, {'session': value, 'writes': self.server.sessions_state(cfg)}, extra={'ETag': '"r%d"' % revision})
             return
         if self.command not in ('PUT', 'DELETE'):
             raise Failure(405, 'method_not_allowed')
@@ -312,8 +311,7 @@ class Handler(BaseHTTPRequestHandler):
                 raise Failure(400, 'invalid_json') from None
         status, response = store.write(int(match.group(1)), body, self.headers.get('Idempotency-Key'))
         proxy.check_live()
-        rev = (response.get('session') or {}).get('revision', 0)
-        self.json(status, response, extra={'ETag': '"r%d"' % rev})
+        self.json(status, response, extra={'ETag': '"r%d"' % response.get('revision', 0)})
 
     def registry(self, cfg, identity):
         apps = []

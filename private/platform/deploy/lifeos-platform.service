@@ -40,6 +40,10 @@ LockPersonality=yes
 RestrictRealtime=yes
 RestrictSUIDSGID=yes
 SystemCallArchitectures=native
+SystemCallFilter=@system-service
+SystemCallErrorNumber=EPERM
+MemoryDenyWriteExecute=yes
+RestrictNamespaces=yes
 
 [Install]
 WantedBy=default.target

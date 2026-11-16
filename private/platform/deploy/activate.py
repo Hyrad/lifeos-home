@@ -70,6 +70,8 @@ def record(evidence, name, value):
 def preflight(a):
     cfg, digest = serve_json()
     problems = []
+    if Path(a.release).resolve().parent != (ROOT / 'releases').resolve():
+        problems.append('release must be a staged directory under the platform releases root')
     if str(a.port) in cfg.get('TCP', {}) or any(k.endswith(f':{a.port}') for k in cfg.get('Web', {})):
         problems.append('port already configured in Serve')
     if listening(a.port):
@@ -111,6 +113,8 @@ def install_and_start(a):
     STATE.mkdir(parents=True, exist_ok=True, mode=0o700)
     os.chmod(STATE, 0o700)
     current = ROOT / 'current'
+    previous = os.readlink(current) if current.is_symlink() else None
+    record(a.evidence, 'current-before.json', {'previous': previous})
     if current.is_symlink():
         current.unlink()
     current.symlink_to(Path('releases') / Path(a.release).name)
@@ -154,6 +158,15 @@ def rollback(a, before=None):
         run('systemctl', '--user', 'daemon-reload')
         run('systemctl', '--user', 'reset-failed', UNIT, check=False)
         steps.append('unit stopped and removed')
+    marker = Path(a.evidence) / 'current-before.json'
+    if marker.exists():
+        previous = json.loads(marker.read_text())['previous']
+        current = ROOT / 'current'
+        if current.is_symlink():
+            current.unlink()
+        if previous:
+            current.symlink_to(previous)
+        steps.append('current release link restored' if previous else 'current release link removed')
     final, digest = serve_json()
     baseline = before if before is not None else json.loads((Path(a.evidence) / 'serve-before.json').read_text())
     ok = final == baseline and not SOCK.exists()

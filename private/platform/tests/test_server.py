@@ -63,7 +63,7 @@ class RoutingAndAssetTests(unittest.TestCase):
         self.assertEqual((status, h['content-type']), (200, 'text/javascript'))
         for path in ['/lifeos-home/../secret.txt', '/lifeos-home/%2e%2e/secret.txt', '/lifeos-home/assets/missing.js',
                      '/lifeos-home/.hidden.js', '/lifeos-home//etc/passwd', '/lifeos-home/assets/app.exe', '/platform.json',
-                     '/lifeos-health/', '/game-shelf/']:
+                     '/lifeos-health/', '/game-shelf/', '/lifeos-home/.vite/manifest.json']:
             status, _, body = self.h.request('GET', path)
             with self.subTest(path=path):
                 self.assertEqual(status, 404)

@@ -123,10 +123,14 @@ def create_backup(db_path, dest, data_dir, recipient_file, require_separate_devi
         home = Path(tmp) / 'gnupg'
         home.mkdir(mode=0o700)
         partial = Path(dest) / (name + '.partial')
-        _gpg(['--trust-model', 'always', '--recipient-file', str(recipient_file), '--output', str(partial),
-              '--encrypt', str(archive)], home)
-        with open(partial, 'rb') as f:
-            os.fsync(f.fileno())
+        try:
+            _gpg(['--trust-model', 'always', '--recipient-file', str(recipient_file), '--output', str(partial),
+                  '--encrypt', str(archive)], home)
+            with open(partial, 'rb') as f:
+                os.fsync(f.fileno())
+        except BaseException:
+            partial.unlink(missing_ok=True)
+            raise
         os.chmod(partial, 0o600)
         digest = sha256_file(partial)
         os.replace(partial, final)
@@ -163,13 +167,18 @@ def prune(dest, now=None, daily=14, weekly=8):
 
 
 def restore(archive, target, gnupghome):
-    """Decrypt and verify into an isolated new directory; never touches the live database."""
+    """Decrypt and verify into an isolated new directory; never touches the live database.
+    The ciphertext is read once; its hash must match the required sidecar before decryption."""
     archive, target = Path(archive), Path(target)
     sidecar = Path(str(archive) + '.json')
-    if sidecar.exists() and json.loads(sidecar.read_text())['archive_sha256'] != sha256_file(archive):
+    if not sidecar.is_file():
+        raise BackupError('archive sidecar missing')
+    ciphertext = archive.read_bytes()
+    digest = hashlib.sha256(ciphertext).hexdigest()
+    if json.loads(sidecar.read_text()).get('archive_sha256') != digest:
         raise BackupError('archive hash mismatch')
     target.mkdir(mode=0o700)
-    plain = _gpg(['--decrypt', str(archive)], gnupghome).stdout
+    plain = _gpg(['--decrypt'], gnupghome, input=ciphertext).stdout
     with tarfile.open(fileobj=io.BytesIO(plain)) as tar:
         members = tar.getmembers()
         if sorted(m.name for m in members) != ['manifest.json', 'platform.sqlite3'] or not all(m.isreg() for m in members):
@@ -198,7 +207,7 @@ def restore(archive, target, gnupghome):
         session = store._current()
     finally:
         store.close()
-    return {'schema_version': version, 'session_present': session is not None, 'manifest': manifest}
+    return {'schema_version': version, 'session_present': session is not None, 'manifest': manifest, 'archive_sha256': digest}
 
 
 def latest_archive(dest):
@@ -221,7 +230,7 @@ def drill(dest, data_dir, gnupghome, record=True):
         report = restore(archive, Path(tmp) / 'restore', gnupghome)
     if record:
         _write_private_json(Path(data_dir) / GATE_FILE, {'verified_at': _now().isoformat(timespec='seconds'),
-                                                         'archive_sha256': sha256_file(archive),
+                                                         'archive_sha256': report['archive_sha256'],
                                                          'destination': destination_id})
     return report
 

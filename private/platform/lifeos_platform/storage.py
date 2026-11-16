@@ -25,7 +25,7 @@ MIGRATIONS = [
         """CREATE TABLE cooking_session (
              slot TEXT PRIMARY KEY CHECK (slot = 'current'),
              revision INTEGER NOT NULL CHECK (revision > 0),
-             body TEXT NOT NULL,
+             body TEXT,  -- NULL = ended/expired tombstone; revision never restarts
              updated_at TEXT NOT NULL)""",
         """CREATE TABLE cooking_idempotency (
              key TEXT PRIMARY KEY,
@@ -170,28 +170,33 @@ class CookingSessions:
     def close(self):
         self.conn.close()
 
-    def _purge(self):
+    def _expire(self):
+        """Write-path only: turn expired sessions into tombstones (revision kept) and drop old
+        idempotency records. Never called on reads, so read-only mode never changes data."""
         cutoff = _iso(_now() - SESSION_TTL)
-        self.conn.execute('DELETE FROM cooking_session WHERE updated_at < ?', (cutoff,))
+        self.conn.execute('UPDATE cooking_session SET body = NULL WHERE body IS NOT NULL AND updated_at < ?', (cutoff,))
         self.conn.execute('DELETE FROM cooking_idempotency WHERE created_at < ?', (_iso(_now() - IDEMPOTENCY_TTL),))
 
-    def _current(self):
+    def _row(self):
+        """-> (revision, session or None). Expired sessions read as None without modification."""
         row = self.conn.execute('SELECT revision, body, updated_at FROM cooking_session WHERE slot = ?', ('current',)).fetchone()
         if row is None:
-            return None
-        return {**json.loads(row[1]), 'revision': row[0], 'updatedAt': row[2]}
+            return 0, None
+        if row[1] is None or row[2] < _iso(_now() - SESSION_TTL):
+            return row[0], None
+        return row[0], {**json.loads(row[1]), 'revision': row[0], 'updatedAt': row[2]}
+
+    def _current(self):
+        return self._row()[1]
 
     def get(self):
+        """-> (revision, session or None); a plain read transaction, no writes."""
         with self.lock:
-            self.conn.execute('BEGIN IMMEDIATE')
+            self.conn.execute('BEGIN')
             try:
-                self._purge()
-                value = self._current()
+                return self._row()
+            finally:
                 self.conn.execute('COMMIT')
-                return value
-            except BaseException:
-                self.conn.execute('ROLLBACK')
-                raise
 
     def write(self, expected_revision, body, idempotency_key=None):
         """expected_revision: 0 = create only if none exists; n = replace only revision n.
@@ -205,7 +210,7 @@ class CookingSessions:
         with self.lock:
             self.conn.execute('BEGIN IMMEDIATE')
             try:
-                self._purge()
+                self._expire()
                 if idempotency_key is not None:
                     prior = self.conn.execute('SELECT request_sha, status, response FROM cooking_idempotency WHERE key = ?',
                                               (idempotency_key,)).fetchone()
@@ -214,19 +219,21 @@ class CookingSessions:
                         if prior[0] != request_sha:
                             raise Failure(422, 'idempotency_key_reused')
                         return prior[1], json.loads(prior[2])
-                current = self._current()
-                current_revision = current['revision'] if current else 0
+                current_revision, current = self._row()
                 if current_revision != expected_revision:
-                    status, response = 409, {'error': 'revision_conflict', 'session': current}
+                    status, response = 409, {'error': 'revision_conflict', 'revision': current_revision, 'session': current}
                 elif clean is None:
-                    self.conn.execute('DELETE FROM cooking_session WHERE slot = ?', ('current',))
-                    status, response = 200, {'session': None}
+                    revision = current_revision + 1 if current_revision else 0
+                    if current_revision:
+                        self.conn.execute('UPDATE cooking_session SET revision = ?, body = NULL, updated_at = ? WHERE slot = ?',
+                                          (revision, _iso(_now()), 'current'))
+                    status, response = 200, {'session': None, 'revision': revision}
                 else:
                     revision, now = current_revision + 1, _iso(_now())
                     self.conn.execute('INSERT INTO cooking_session VALUES (?,?,?,?) ON CONFLICT(slot) DO UPDATE SET '
                                       'revision=excluded.revision, body=excluded.body, updated_at=excluded.updated_at',
                                       ('current', revision, json.dumps(clean, sort_keys=True), now))
-                    status, response = 200, {'session': {**clean, 'revision': revision, 'updatedAt': now}}
+                    status, response = 200, {'session': {**clean, 'revision': revision, 'updatedAt': now}, 'revision': revision}
                 if idempotency_key is not None and status == 200:
                     self.conn.execute('INSERT INTO cooking_idempotency VALUES (?,?,?,?,?)',
                                       (idempotency_key, request_sha, status, json.dumps(response), _iso(_now())))
