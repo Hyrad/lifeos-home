@@ -217,7 +217,7 @@ try {
     assert.equal(await page.locator(".wine-card").count(), 8);
     assert.match(
       await page.locator(".release-version").textContent(),
-      /^v\d+\.\d+\.\d+$/,
+      /^v\d+\.\d+(\.\d+)?$/, // Wine public release labels are v<major>.<minor> (v1.205)
     );
     assert.equal(
       await page.evaluate(
