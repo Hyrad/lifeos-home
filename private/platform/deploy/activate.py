@@ -35,8 +35,16 @@ CONFIG = HOME / '.config/lifeos-platform/platform.json'
 STATE = HOME / '.local/state/lifeos-platform'
 
 
+SUDO_SERVE = False  # set by --sudo-serve: Serve changes on hosts without a Tailscale operator user
+
+
 def run(*args, check=True):
     return subprocess.run(args, capture_output=True, text=True, check=check, timeout=60)
+
+
+def serve_change(*args):
+    prefix = ('sudo', '-n') if SUDO_SERVE else ()
+    return run(*prefix, 'tailscale', 'serve', *args)
 
 
 def serve_json():
@@ -130,7 +138,7 @@ def install_and_start(a):
 
 
 def add_handler(a, before):
-    run('tailscale', 'serve', '--bg', f'--https={a.port}', f'unix:{SOCK}')
+    serve_change('--bg', f'--https={a.port}', f'unix:{SOCK}')
     after, _ = serve_json()
     if without_port(after, a.port) != before:
         raise RuntimeError('Serve configuration changed outside the new port')
@@ -149,7 +157,7 @@ def rollback(a, before=None):
     if web:
         if any(v.get('Handlers') != {'/': {'Proxy': f'unix:{SOCK}'}} for v in web.values()):
             raise SystemExit('ROLLBACK REFUSED: port contains a handler that is not the platform socket')
-        run('tailscale', 'serve', f'--https={a.port}', 'off')
+        serve_change(f'--https={a.port}', 'off')
         steps.append('serve handler removed')
     if UNIT_DST.exists():
         run('systemctl', '--user', 'stop', UNIT, check=False)
@@ -217,7 +225,10 @@ def main():
     p.add_argument('--release')
     p.add_argument('--evidence', required=True)
     p.add_argument('--keep', action='store_true')
+    p.add_argument('--sudo-serve', action='store_true', help='prefix only the two Serve changes with sudo -n (run `sudo -v` first)')
     a = p.parse_args()
+    global SUDO_SERVE
+    SUDO_SERVE = a.sudo_serve
     if a.cmd == 'preflight':
         _, problems = preflight(a)
         print(json.dumps({'problems': problems}))
